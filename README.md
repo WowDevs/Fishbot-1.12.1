@@ -8,4 +8,4 @@ Note:
 - Do not use on live servers - you have a high chance of a ban.
 - Use at your own risk.
 
-![alt tag](http://i.imgur.com/2AUKbtd.png)
+![alt tag](http://i.imgur.com/tDR66AP.png)
