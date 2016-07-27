@@ -1,0 +1,2421 @@
+﻿public static readonly IntPtr CGGameUI__EnterWorld = new IntPtr(0x4908C0);
+public static readonly IntPtr CGLootInfo__HasLoot = new IntPtr(0x4C2A70);
+public static readonly IntPtr CGPlayer_C__CanTrackObject = new IntPtr(0x5ED2B0);
+public static readonly IntPtr CGPlayer_C__CanTrackUnit = new IntPtr(0x5ED210);
+public static readonly IntPtr CGPlayer_C__ClickToMove = new IntPtr(0x00611130);
+public static readonly IntPtr ClientConnection__SendPacket = new IntPtr(0x005379A0);
+public static readonly IntPtr ClientServices__SetMessageHandler = new IntPtr(0x005AB650);
+public static readonly IntPtr ClntObjMgrEnumVisibleObjects = new IntPtr(0x00468380);
+public static readonly IntPtr ClntObjMgrGetActivePlayer = new IntPtr(0x00468550);
+public static readonly IntPtr ClntObjMgrGetMapId = new IntPtr(0x00468580);
+public static readonly IntPtr ClntObjMgrObjectPtr = new IntPtr(0x00468460);
+public static readonly IntPtr ClntObjMgrSetMapId = new IntPtr(0x004685A0);
+public static readonly IntPtr CMovement__MoveUnit = new IntPtr(0x00616620);
+public static readonly IntPtr FrameScript__Execute = new IntPtr(0x00704CD0);
+public static readonly IntPtr FrameScript__Register = new IntPtr(0x00704120);
+public static readonly IntPtr FixSwimming = new IntPtr(0x007C6E88);
+public static readonly IntPtr GetContainerGuid = new IntPtr(0x4F93E0);
+public static readonly IntPtr NetClient__ProcessMessage = new IntPtr(0x537AA0);
+
+ClientConnection__SendPacket 0x005379A0
+Framescript__Execute 0x00704CD0
+PerformanceCounter 0x42C010
+
+GetPosition 5
+GetFacing 6
+GetName 28
+
+ObjectManager 0x00B41414
+FirstObject 0xAC
+NextObject 0x3C
+ActivePlayerGuid 0xC0
+
+FrameScript::Register: 0x704120
+FrameScript::GetContext: 0x7040D0
+
+Player_Base +
+Player_Y 09B8
+Player_X 09BC
+Player_Z 09C0
+Player_Facing 09C4
+Player_Speed 0A2C
+Player_SpeedModifierRun 0A34
+
+MinimapZoneText = 0x74DA28
+SubZoneText = 0x74E280
+RealZoneText = 0x74B404
+ZoneText = 0x74B3F8
+ClickToMoveX = 0x84DA84
+ClickToMovePus = 0x84D93C / 0/1
+ObjectManager 0x741414
+FirstObj = 0xAC
+NextObj = 0x3C
+Playerbase = 0x853D40
+
+$CurrentRotationOfCam 		= _MemoryRead(0x00CE9B90, $DLLInformation, 'float')
+$CurrentZ					= _MemoryRead(0x00225C28, $DLLInformation, 'float')
+$CurrentX					= _MemoryRead(0x00C62524, $DLLInformation, 'float')
+$CurrentY					= _MemoryRead(0x00C62528, $DLLInformation, 'float')
+
+UInt64 localGUID;
+localGUID = bm.ReadUInt64(0xB41414 + 0xC0);
+curObj = bm.ReadUInt(0xB41414  + 0xAC);
+nextObj = curObj;
+while (curObj != 0 && (curObj & 1) == 0)
+{
+    UInt64 cGUID = 0;
+    try
+    {
+        cGUID = bm.ReadUInt64(curObj + 0x30);
+    }
+    catch { }
+
+    try
+    {
+        float x = bm.ReadFloat(curObj + 0xBF0);
+        float y = bm.ReadFloat(curObj + 0xBF4);
+        float z = bm.ReadFloat(curObj + 0xBF8);
+
+        if (cGUID == localGUID)
+        {
+            localObj = curObj;
+        }
+        Logging.OnNewLog(string.Format("GUID: {0} - X: {1} Y: {2} Z: {3}", cGUID, x, y, z));
+    }
+    catch { }
+    try
+    {
+        nextObj = bm.ReadUInt(curObj + 0x3C);
+    }
+}
+
+namespace Offsets
+{
+	namespace General
+	{
+		DWORD_PTR
+			IsInGame                   = 0x00B4B424, // 1.12.1.5875 (Byte)
+	}
+	
+	namespace Camera
+	{
+		DWORD_PTR
+			CameraPtr                  = 0x0074B2BC, // 1.12.1.5875
+			CameraPtrOffset            = 0x000065B8, // 1.12.1.5875
+			CameraPosition             = 0x00000008, // 1.12.1.5875 (CVec3)
+			CameraFollowingGUID        = 0x00000088; // 1.12.1.5875 (GUID)
+	}
+
+	namespace ObjectManager
+	{
+		DWORD_PTR
+			ObjectDescriptors          = 0x00000008, // 1.12.1.5875
+			ObjectMovementData         = 0x00000118, // 1.12.1.5875 (UInt)
+			ObjectMovementDataPosition = 0x00000010, // 1.12.1.5875 (CVec3)
+			ObjectMovementDataRotation = 0x0000001C, // 1.12.1.5875 (Float)
+			ObjectMovementDataState    = 0x000000A0, // 1.12.1.5875 (UInt)
+			ObjectMovementDataFlags    = 0x00000040, // 1.12.1.5875 (UInt)
+			ObjectMovementDataRunSpeed = 0x0000008C, // 1.12.1.5875 (Float)
+			PlayerObjectTracking       = 0x00002EB0; // 1.12.1.5875 (Byte)
+	}
+		
+	namespace Hacks
+	{
+		DWORD_PTR
+			SuperFly                   = 0x006341BC, // 1.12.1.5875 (Array) - On: { 0x90, 0x90 } - Off: { 0x74, 0x25 }
+			NoFallDamage               = 0x007C63DA, // 1.12.1.5875 (Array) - On: { 0x31, 0xC9, 0x90 } - Off: { 0x8B, 0x4F, 0x78 }
+			AntiJump                   = 0x007C625F, // 1.12.1.5875 (Array) - On: { 0xEB } - Off: { 0x75 }
+			AntiMove                   = 0x00615CF5, // 1.12.1.5875 (Array) - On: { 0xFE } - Off: { 0xF8 }
+			AntiRoot                   = 0x006163DB, // 1.12.1.5875 (Array) - On: { 0xEB, 0xF9 } - Off: { 0x8A, 0x47 }
+			InfiniteJump               = 0x007C625E, // 1.12.1.5875 (Array) - On: { 0x10 } - Off: { 0x30 }
+			JumpGravity                = 0x007C6272, // 1.12.1.5875 (Float)
+			JumpGravityWater           = 0x007C6269, // 1.12.1.5875 (Float)
+			WallClimb                  = 0x0080DFFC, // 1.12.1.5875 (Float)
+			HeartbeatInterval          = 0x00615BA7; // 1.12.1.5875 (UInt)  - Speedhack anti-disconnect
+	}
+}
+
+WoW.exe + 0x0087BCD4 + 0x88 + 0x18 pointers to player guid
+
+0x00B4E2D8 (4 bytes) NPC ID, Player GUID
+0x00B4E2DA (4 bytes) GUID of NPC
+
+0x00B41E30
+0x00C27D80
+0x00C4DA98 (all 4 bytes) your own guid
+
+0x00884e44 X position of mouse
+0x00884e48 Y position of mouse
+
+0x00C7B548 (float) Player X
+0x00C7B544 (float) Player Y
+0x00C7B54C (float) Player Z
+
+0x00837C04 (6 character string) Game version
+
+0x00B4E2C8 (2 bytes) Mouseover NPC/Player ID
+
+0x0087D894 (float) Falling speed
+
+0x00B4E284
+0x00B4E288
+0x00B4E28C (all floats) X/Y/Z of corpse
+
+PLAYERBASE
++0x8 (4 bytes) own guid
++0x20 (4 bytes) own guid
++0x9C0 (float) changeable X-coordinate
++0x9C4 (float) changeable Y-coordinate
++0x9C8 (float) changeable Z-coordinate
++0x9EF (4 bytes, Hex) state of movement
++0x9F3 (byte) type of movement, the following are useful values: 16 (whisp, waterwalk), 80 (levitation), 144 (dead, waterwalk), 34 (slowfall)
++0xA2C (float) jump starting height
++0xA34 (float) movement speed
++0xA38 (float) walking default speed
++0xA3C (float) swimming speed
++0xA4C (float) camera speed
++0x1DD0 (4 bytes) Health (for maximum health/mana/rage/whatever just check in intervals of 4 bytes from this one, they're near )
++0x1DB8 2 bytes -> id of targeted npc
+4 bytes -> id of targeted player
++0x2EB8 (4 bytes) hunter tracking, 255 for everything
++0x2EBC (4 bytes) herb/mineral tracking, 255 for everything
+
+For airswim modify:
+0x007C620D [Array of bytes with the length of 2]
+Change value of
+0x007C620D to 00 and the value of 0x007C620E to 20, then your characters default movement type is swimming. change those back to 20|00 instead of 00|20 and default movement is walking again.
+
+0x488B00 Script_RegisterCVar
+0x488BA0 Script_GetCVar
+0x488C10 Script_SetCVar
+0x488CF0 Script_SetCVarDefault
+0x488DD0 Script_SetWorldDetail
+0x488ED0 Script_SetWaterDetail
+0x488F30 Script_SetFarclip
+0x488FE0 Script_SetTerrainMip
+0x489090 Script_SetDoodadAnim
+0x489140 Script_SetTexLodBias
+0x4891F0 Script_SetGamma
+0x4892B0 Script_SetBaseMip
+0x489490 Script_SetCursor
+0x489660 Script_EquipCursorItem
+0x4899D0 Script_TargetUnit
+0x489B80 Script_AssistUnit
+0x489C40 Script_AssistByName
+0x489D60 Script_TargetByName
+0x489E00 Script_FollowUnit
+0x489EC0 Script_FollowByName
+0x48A120 Script_InitiateTrade
+0x48A1B0 Script_CanInspect
+0x48A310 Script_NotifyInspect
+0x48A3B0 Script_InviteToParty
+0x48A420 Script_InviteByName
+0x48A510 Script_UninviteFromParty
+0x48A580 Script_UninviteFromRaid
+0x48A610 Script_UninviteByName
+0x48A7C0 Script_PromoteToPartyLeader
+0x48A830 Script_PromoteByName
+0x48ABC0 Script_PickupPlayerMoney
+0x48AFB0 Script_GuildUninviteByName
+0x48B050 Script_GuildPromoteByName
+0x48B0F0 Script_GuildDemoteByName
+0x48B190 Script_GuildSetLeaderByName
+0x48B270 Script_GuildSetMOTD
+0x48BA00 Script_CheckInteractDistance
+0x48C270 Script_SetupFullscreenScale
+0x48C7B0 Script_RandomRoll
+0x48C9D0 Script_NewGMTicket
+0x48CA60 Script_UpdateGMTicket
+0x48CC00 Script_GMSurveyGetQuestion
+0x48CD30 Script_GMSurveyAnswerSubmit
+0x48CEF0 Script_GMSurveyCommentSubmit
+0x48D4E0 Script_GetCoinIcon
+0x48D960 Script_DropItemOnUnit
+0x48DFB0 Script_GetItemQualityColor
+0x48E070 Script_GetItemInfo
+0x48E390 Script_GetAddOnInfo
+0x48E530 Script_GetAddOnMetadata
+0x48E5E0 Script_GetAddOnDependencies
+0x48E690 Script_EnableAddOn
+0x48E760 Script_DisableAddOn
+0x48E840 Script_IsAddOnLoadOnDemand
+0x48E8E0 Script_IsAddOnLoaded
+0x48E980 Script_LoadAddOn
+0x49F1E0 Script_SendChatMessage
+0x49F920 Script_SendAddonMessage
+0x49FBE0 Script_GetLanguageByIndex
+0x49FD30 Script_DoEmote
+0x49FF00 Script_JoinChannelByName
+0x4A0000 Script_LeaveChannelByName
+0x4A0060 Script_SetGuildRecruitmentMode
+0x4A03A0 Script_SetChannelPassword
+0x4A05E0 Script_GetChannelName
+0x4A0A80 Script_GetChatTypeIndex
+0x4A0BA0 Script_GetChatWindowInfo
+0x4A0D20 Script_GetChatWindowMessages
+0x4A0DC0 Script_GetChatWindowChannels
+0x4A0E80 Script_AddChatWindowMessages
+0x4A0F40 Script_RemoveChatWindowMessages
+0x4A1000 Script_AddChatWindowChannel
+0x4A1260 Script_RemoveChatWindowChannel
+0x4A13F0 Script_SetChatWindowName
+0x4A1470 Script_SetChatWindowSize
+0x4A14F0 Script_SetChatWindowColor
+0x4A15D0 Script_SetChatWindowAlpha
+0x4A1650 Script_SetChatWindowLocked
+0x4A16B0 Script_SetChatWindowDocked
+0x4A1730 Script_SetChatWindowShown
+0x4A1920 Script_GetSavedInstanceInfo
+0x4A7D10 Script_GetMapZones
+0x4A7DB0 Script_SetMapZoom
+0x4A7F30 Script_ProcessMapClick
+0x4A7FA0 Script_UpdateMapHighlight
+0x4A8610 Script_GetPlayerMapPosition
+0x4A8740 Script_GetMapLandmarkInfo
+0x4A88F0 Script_GetWorldLocMapPosition
+0x4A8A00 Script_GetMapOverlayInfo
+0x4A8BB0 Script_CreateWorldMapArrowFrame
+0x4A8C60 Script_CreateMiniWorldMapArrowFrame
+0x4A8D20 Script_PositionWorldMapArrowFrame
+0x4A8F20 Script_PositionMiniWorldMapArrowFrame
+0x4AB1F0 Script_GetBattlefieldInfo
+0x4AB290 Script_JoinBattlefield
+0x4AB300 Script_SetSelectedBattlefield
+0x4AB3B0 Script_AcceptBattlefieldPort
+0x4AB4A0 Script_GetBattlefieldStatus
+0x4AB620 Script_GetBattlefieldPortExpiration
+0x4AB790 Script_GetBattlefieldEstimatedWaitTime
+0x4AB820 Script_GetBattlefieldTimeWaited
+0x4AB8C0 Script_ShowBattlefieldList
+0x4AB9D0 Script_GetBattlefieldScore
+0x4ABD00 Script_GetBattlefieldStatInfo
+0x4ABDC0 Script_GetBattlefieldStatData
+0x4ABF90 Script_GetBattlefieldPosition
+0x4AC230 Script_GetBattlefieldFlagPosition
+0x4AE0F0 Script_SetSendMailMoney
+0x4AE180 Script_SetSendMailCOD
+0x4AE230 Script_GetStationeryInfo
+0x4AE380 Script_SelectStationery
+0x4AE450 Script_GetPackageInfo
+0x4AE550 Script_SelectPackage
+0x4AE800 Script_SendMail
+0x4AEBC0 Script_GetInboxHeaderInfo
+0x4AF110 Script_GetInboxText
+0x4AF360 Script_GetInboxInvoiceInfo
+0x4AF5D0 Script_GetInboxItem
+0x4AF7D0 Script_TakeInboxMoney
+0x4AF8E0 Script_TakeInboxItem
+0x4AFA60 Script_TakeInboxTextItem
+0x4AFBA0 Script_ReturnInboxItem
+0x4AFCD0 Script_DeleteInboxItem
+0x4AFE00 Script_InboxItemCanDelete
+0x4B3CE0 Script_GetSpellTabInfo
+0x4B45C0 Script_GetShapeshiftFormInfo
+0x4B4810 Script_CastShapeshiftForm
+0x4B49A0 Script_GetShapeshiftFormCooldown
+0x4B4AB0 Script_CastSpellByName
+0x4B59B0 Script_FlagTutorial
+0x4B7F60 Script_GetBinding
+0x4B8000 Script_SetBinding
+0x4B80A0 Script_GetBindingKey
+0x4B8120 Script_GetBindingAction
+0x4B8180 Script_RunBinding
+0x4B8220 Script_LoadBindings
+0x4B8260 Script_SaveBindings
+0x4BB4B0 Script_GetRaidTargetIndex
+0x4BB560 Script_GetRaidRosterInfo
+0x4BB820 Script_SetRaidRosterSelection
+0x4BB990 Script_SetRaidSubgroup
+0x4BBB00 Script_SwapRaidSubgroup
+0x4BBD20 Script_PromoteToAssistant
+0x4BBDF0 Script_DemoteAssistant
+0x4BBEC0 Script_SetRaidTarget
+0x4BDC50 Script_GetPetActionInfo
+0x4BDFA0 Script_GetPetActionCooldown
+0x4BE0E0 Script_IsPetAttackActive
+0x4BE180 Script_PickupPetAction
+0x4BE290 Script_TogglePetAutocast
+0x4BE330 Script_CastPetAction
+0x4BFDF0 Script_ClickTradeButton
+0x4C0080 Script_ClickTargetTradeButton
+0x4C00F0 Script_GetTradeTargetItemInfo
+0x4C0360 Script_GetTradeTargetItemLink
+0x4C0450 Script_GetTradePlayerItemInfo
+0x4C0650 Script_GetTradePlayerItemLink
+0x4C0790 Script_PickupTradeMoney
+0x4C0820 Script_SetTradeMoney
+0x4C1880 Script_SetSlot
+0x4C2C60 Script_GetLootSlotInfo
+0x4C2D20 Script_GetLootSlotLink
+0x4C2D90 Script_LootSlotIsItem
+0x4C2E00 Script_LootSlotIsCoin
+0x4C2E70 Script_LootSlot
+0x4C2F10 Script_GetMasterLootCandidate
+0x4C2FD0 Script_GiveMasterLoot
+0x4C3050 Script_GetLootRollItemInfo
+0x4C31F0 Script_GetLootRollItemLink
+0x4C32D0 Script_GetLootRollTimeLeft
+0x4C3370 Script_RollOnLoot
+0x4C33E0 Script_ConfirmLootRoll
+0x4C4D80 Script_MakeMinigameMove
+0x4C5A70 Script_GetWorldStateUIInfo
+0x4C8150 Script_KeyRingButtonIDToInvSlotID
+0x4C82A0 Script_GetInventoryItemTexture
+0x4C8590 Script_GetInventoryItemBroken
+0x4C8680 Script_GetInventoryItemCount
+0x4C88D0 Script_GetInventoryItemQuality
+0x4C8A60 Script_GetInventoryItemCooldown
+0x4C8C10 Script_GetInventoryItemLink
+0x4C9150 Script_SetInventoryPortaitTexture
+0x4C9330 Script_GetGuildInfo
+0x4C94B0 Script_GetInventoryAlertStatus
+0x4CAF20 Script_UnstablePet
+0x4CB230 Script_GetStablePetInfo
+0x4CB420 Script_ClickStablePet
+0x4CB7A0 Script_PickupStablePet
+0x4CB870 Script_SetPetStablePaperdoll
+0x4CE1C0 Script_CalculateAuctionDeposit
+0x4CE770 Script_StartAuction
+0x4CED20 Script_GetNumAuctionItems
+0x4CEE40 Script_GetAuctionItemInfo
+0x4CF2F0 Script_GetAuctionItemLink
+0x4CF470 Script_GetAuctionItemTimeLeft
+0x4CF610 Script_PlaceAuctionBid
+0x4CF9C0 Script_GetAuctionItemSubClasses
+0x4CFAB0 Script_GetAuctionInvTypes
+0x4CFC00 Script_SortAuctionItems
+0x4CFDA0 Script_SetSelectedAuctionItem
+0x4CFEC0 Script_GetSelectedAuctionItem
+0x4D0030 Script_IsAuctionSortReversed
+0x4D0260 Script_SetSelectedAuctionItem
+0x4D1200 Script_GetGuildRosterInfo
+0x4D14A0 Script_GetGuildRosterLastOnline
+0x4D15E0 Script_GuildRosterSetPublicNote
+0x4D1700 Script_GuildRosterSetOfficerNote
+0x4D1820 Script_SetGuildRosterSelection
+0x4D1E90 Script_GuildControlGetRankName
+0x4D1FA0 Script_GuildControlSetRank
+0x4D2070 Script_GuildControlSetRankFlag
+0x4D20D0 Script_GuildControlSaveRank
+0x4D2210 Script_GuildControlAddRank
+0x4D2380 Script_SetGuildInfoText
+0x4D3610 Script_GetSkillLineInfo
+0x4D3AB0 Script_AbandonSkill
+0x4D3B70 Script_CollapseSkillHeader
+0x4D3BD0 Script_ExpandSkillHeader
+0x4D3C30 Script_AddSkillUp
+0x4D3C70 Script_RemoveSkillUp
+0x4D3E50 Script_BuySkillTier
+0x4D4020 Script_SetSelectedSkill
+0x4D4C90 Script_StartDuelUnit
+0x4D64F0 Script_GetFactionInfo
+0x4D6950 Script_FactionToggleAtWar
+0x4D69B0 Script_SetFactionInactive
+0x4D6A00 Script_SetFactionActive
+0x4D6A50 Script_CollapseFactionHeader
+0x4D6AA0 Script_ExpandFactionHeader
+0x4D6AF0 Script_IsFactionInactive
+0x4D6B60 Script_SetWatchedFactionIndex
+0x4D6BB0 Script_SetSelectedFaction
+0x4D8DC0 Script_GetTrainerServiceInfo
+0x4D8E60 Script_SelectTrainerService
+0x4D8F50 Script_GetTrainerServiceIcon
+0x4D9160 Script_GetTrainerServiceSkillLine
+0x4D92F0 Script_GetTrainerServiceCost
+0x4D93A0 Script_GetTrainerServiceLevelReq
+0x4D9410 Script_GetTrainerServiceSkillReq
+0x4D9600 Script_GetTrainerServiceAbilityReq
+0x4D9930 Script_GetTrainerServiceStepReq
+0x4D9B40 Script_GetTrainerServiceDescription
+0x4D9DD0 Script_IsTrainerServiceSkillStep
+0x4D9E70 Script_IsTrainerServiceLearnSpell
+0x4D9F70 Script_IsTrainerServiceTradeSkill
+0x4DA030 Script_GetTrainerServiceStepIncrease
+0x4DA210 Script_BuyTrainerService
+0x4DA260 Script_SetTrainerServiceTypeFilter
+0x4DA3F0 Script_SetTrainerSkillLineFilter
+0x4DA510 Script_GetTrainerServiceTypeFilter
+0x4DA590 Script_GetTrainerSkillLineFilter
+0x4DA6C0 Script_CollapseTrainerSkillLine
+0x4DA740 Script_ExpandTrainerSkillLine
+0x4DCB30 Script_TaxiNodeName
+0x4DCB80 Script_TaxiNodeTaxiNodeLocation
+0x4DCC20 Script_TaxiNodeCost
+0x4DCCA0 Script_TakeTaxiNode
+0x4DCCF0 Script_TaxiNodeGetType
+0x4DCD40 Script_TaxiNodeSetCurrent
+0x4DF930 Script_GetQuestLogTitle
+0x4DFAE0 Script_SelectQuestLogEntry
+0x4DFE10 Script_IsUnitOnQuest
+0x4E0110 Script_GetQuestLogLeaderBoard
+0x4E0B00 Script_GetQuestLogRewardInfo
+0x4E0EE0 Script_GetQuestLogItemLink
+0x4E15F0 Script_GetQuestIndexForTimer
+0x4E1730 Script_CollapseQuestHeader
+0x4E1780 Script_ExpandQuestHeader
+0x4E1890 Script_IsQuestWatched
+0x4E19B0 Script_GetQuestIndexForWatch
+0x4E2A30 Script_SelectGossipOption
+0x4E2AA0 Script_SelectGossipAvailableQuest
+0x4E2AE0 Script_SelectGossipActiveQuest
+0x4E45D0 Script_GetPlayerBuff
+0x4E4740 Script_GetPlayerBuffTexture
+0x4E4800 Script_GetPlayerBuffDispelType
+0x4E48B0 Script_GetPlayerBuffTimeLeft
+0x4E49A0 Script_CancelPlayerBuff
+0x4E6E10 Script_GetActionTexture
+0x4E6E70 Script_GetActionCount
+0x4E6ED0 Script_GetActionCooldown
+0x4E6F90 Script_GetActionAutocast
+0x4E7050 Script_GetActionText
+0x4E70D0 Script_HasAction
+0x4E7140 Script_UseAction
+0x4E71D0 Script_PickupAction
+0x4E7240 Script_PlaceAction
+0x4E7280 Script_IsAttackAction
+0x4E72F0 Script_IsCurrentAction
+0x4E7360 Script_IsAutorepeatAction
+0x4E73D0 Script_IsUsableAction
+0x4E7470 Script_IsConsumableAction
+0x4E74E0 Script_IsEquippedAction
+0x4E9090 Script_GetPartyMember
+0x4E92A0 Script_SetLootMethod
+0x4E9500 Script_SetLooThreshold
+0x4E9760 Script_LFGQuery
+0x4E98C0 Script_GetLFGResults
+0x4E9AA0 Script_GetLFGTypeEntries
+0x4EE4A0 Script_%s:SetMaskTexture
+0x4EE640 Script_%s:SetIconTexture
+0x4EE7E0 Script_%s:SetBlipTexture
+0x4EE980 Script_%s:SetArrowModel
+0x4EEAB0 Script_%s:SetPlayerModel
+0x4EEC60 Script_SetZoom
+0x4F15B0 Script_CreateMacro
+0x4F1760 Script_GetMacroInfo
+0x4F1850 Script_DeleteMacro
+0x4F18B0 Script_EditMacro
+0x4F1A30 Script_GetMacroIconInfo
+0x4F1AE0 Script_PickupMacro
+0x4F1B30 Script_GetMacroIndexByName
+0x4F3040 Script_GetTalentTabInfo
+0x4F3160 Script_GetNumTalents
+0x4F3200 Script_GetTalentInfo
+0x4F34D0 Script_GetTalentPrereqs
+0x4F36A0 Script_LearnTalent
+0x4F4510 Script_GetPetitionNameInfo
+0x4F5260 Script_BuyGuildCharter
+0x4F6E90 Script_GetCraftInfo
+0x4F70F0 Script_SelectCraft
+0x4F7160 Script_GetTradeSkillIcon
+0x4F7210 Script_GetCraftSkillLine
+0x4F72A0 Script_GetCraftItemLink
+0x4F7420 Script_GetCraftNumReagents
+0x4F74D0 Script_GetCraftReagentInfo
+0x4F7730 Script_GetCraftReagentItemLink
+0x4F78B0 Script_GetCraftSpellFocus
+0x4F7A90 Script_GetCraftDescription
+0x4F7C10 Script_CollapseCraftSkillLine
+0x4F7C90 Script_ExpandCraftSkillLine
+0x4F7D10 Script_DoCraft
+0x4F8530 Script_BankButtonIDToInvSlotID
+0x4F94E0 Script_ContainerIDToInventoryID
+0x4F9560 Script_GetContainerNumSlots
+0x4F9670 Script_GetContainerItemInfo
+0x4F9930 Script_GetContainerItemLink
+0x4F99B0 Script_GetContainerItemCooldown
+0x4F9B30 Script_PickupContainerItem
+0x4F9F70 Script_SplitContainerItem
+0x4FA0E0 Script_UseContainerItem
+0x4FA460 Script_ShowContainerSellCursor
+0x4FA4F0 Script_SetBagPortaitTexture
+0x4FA670 Script_GetBagName
+0x4FB150 Script_GetMerchantItemInfo
+0x4FB310 Script_GetBuybackItemInfo
+0x4FB580 Script_GetMerchantItemLink
+0x4FB670 Script_GetMerchantItemMaxStack
+0x4FB850 Script_BuyMerchantItem
+0x4FB950 Script_BuybackItem
+0x4FBAB0 Script_ShowMerchantSellCursor
+0x4FBBB0 Script_ShowBuybackSellCursor
+0x4FD820 Script_GetTradeSkillInfo
+0x4FD9B0 Script_SelectTradeSkill
+0x4FDA20 Script_GetTradeSkillCooldown
+0x4FDC50 Script_GetTradeSkillNumMade
+0x4FDEC0 Script_GetTradeSkillItemStats
+0x4FF410 Script_GetTradeSkillItemLink
+0x4FF510 Script_GetTradeSkillNumReagents
+0x4FF5C0 Script_GetTradeSkillReagentInfo
+0x4FF800 Script_GetTradeReagentSkillItemLink
+0x4FF980 Script_GetTradeSkillTools
+0x4FFC70 Script_SetTradeSkillSubClassFilter
+0x4FFD90 Script_GetTradeSkillSubClassFilter
+0x4FFE60 Script_SetTradeSkillInvSlotFilter
+0x4FFFD0 Script_GetTradeSkillInvSlotFilter
+0x5000C0 Script_CollapseTradeSkillSubClass
+0x500140 Script_ExpandTradeSkillSubClass
+0x500280 Script_DoTradeSkill
+0x501AC0 Script_GetAvailableTitle
+0x501B30 Script_GetActiveTitle
+0x501BA0 Script_GetGetAvailableLevel
+0x501C20 Script_GetGetActiveLevel
+0x501CA0 Script_SelectAvailableQuest
+0x501CE0 Script_SelectActiveQuest
+0x502090 Script_GetQuestItemLink
+0x502CA0 Script_CycleVariation
+0x503160 Script_%s:GetUpperEmblemTexture
+0x503540 Script_%s:GetLowerEmblemTexture
+0x505D70 Script_SetUnit
+0x505F00 Script_SetRotation
+
+FrameScript__GetText = 0x703BF0,
+CGGameUI__Target = 0x489A40,
+FrameScript_SignalEvent = 0x703E50,
+FrameScript_SignalEvent2 = 0x703F50,
+ItemWDBCacheGetRow = 0x55BA30,
+CallAutoLoot = 0x4C1FA0,
+CGGameUI__DisplayError = 0x496720,
+CGWorldFrame__GetActiveCamera = 0x4818F0
+
+CastingSpellId = 0xCECA88,
+LastHardwareAction = 0xCF0BC8,
+ContinentID = 0x86F694,
+ClientServiceConnection = 0xB41DA0,
+EquippedBagGUID = 0xBDD060,
+ChatBase = 0xB50580,
+NextMessage = 0x800,
+
+internal enum UIFrame
+{
+     CurrentFramePtr = 0xCF0BD8,
+     CurrentFrameOffset = 0x7C,
+     FirstFrame = 0xCC4,
+     NextFrame = 0xCBC,
+     UnkDivWidth = 0x832A44,
+     UnkDivHeight = UnkDivWidth + 0x4,
+     FrameBottom = 0x64,
+     FrameLeft = FrameBottom + 0x4,
+     FrameTop = FrameBottom + 0x8,
+     FrameRight = FrameBottom + 0xC,
+     ParentPtr = 0x9C,
+     EffectiveScale = 0x7C,
+     Name = 0x98,
+     LabelText = 0xF0,
+     EditBoxText = 0x338,
+     Visible = 0xD4,
+     Enabled = 0x328,
+     EnabledMask = 0x20,
+     ButtonChecked = 0x4DC,
+}
+
+internal enum UnitFields
+{
+        UNIT_FIELD_CHARM = ObjectFields.OBJECT_END + 0x0,
+        UNIT_FIELD_SUMMON = ObjectFields.OBJECT_END + 0x8,
+        UNIT_FIELD_CHARMEDBY = ObjectFields.OBJECT_END + 0x10,
+        UNIT_FIELD_SUMMONEDBY = ObjectFields.OBJECT_END + 0x18,
+        UNIT_FIELD_CREATEDBY = ObjectFields.OBJECT_END + 0x20,
+        UNIT_FIELD_TARGET = ObjectFields.OBJECT_END + 0x28,
+        UNIT_FIELD_PERSUADED = ObjectFields.OBJECT_END + 0x30,
+        UNIT_FIELD_CHANNEL_OBJECT = ObjectFields.OBJECT_END + 0x38,
+        UNIT_FIELD_HEALTH = ObjectFields.OBJECT_END + 0x40,
+        UNIT_FIELD_POWER1 = ObjectFields.OBJECT_END + 0x44,
+        UNIT_FIELD_POWER2 = ObjectFields.OBJECT_END + 0x48,
+        UNIT_FIELD_POWER3 = ObjectFields.OBJECT_END + 0x4C,
+        UNIT_FIELD_POWER4 = ObjectFields.OBJECT_END + 0x50,
+        UNIT_FIELD_POWER5 = ObjectFields.OBJECT_END + 0x54,
+        UNIT_FIELD_MAXHEALTH = ObjectFields.OBJECT_END + 0x58,
+        UNIT_FIELD_MAXPOWER1 = ObjectFields.OBJECT_END + 0x5C,
+        UNIT_FIELD_MAXPOWER2 = ObjectFields.OBJECT_END + 0x60,
+        UNIT_FIELD_MAXPOWER3 = ObjectFields.OBJECT_END + 0x64,
+        UNIT_FIELD_MAXPOWER4 = ObjectFields.OBJECT_END + 0x68,
+        UNIT_FIELD_MAXPOWER5 = ObjectFields.OBJECT_END + 0x6C,
+        UNIT_FIELD_LEVEL = ObjectFields.OBJECT_END + 0x70,
+        UNIT_FIELD_FACTIONTEMPLATE = ObjectFields.OBJECT_END + 0x74,
+        UNIT_FIELD_BYTES_0 = ObjectFields.OBJECT_END + 0x78,
+        UNIT_VIRTUAL_ITEM_SLOT_DISPLAY = ObjectFields.OBJECT_END + 0x7C,
+        UNIT_VIRTUAL_ITEM_INFO = ObjectFields.OBJECT_END + 0x88,
+        UNIT_FIELD_FLAGS = ObjectFields.OBJECT_END + 0xA0,
+        UNIT_FIELD_AURA = ObjectFields.OBJECT_END + 0xA4,
+        UNIT_FIELD_AURAFLAGS = ObjectFields.OBJECT_END + 0x164,
+        UNIT_FIELD_AURALEVELS = ObjectFields.OBJECT_END + 0x17C,
+        UNIT_FIELD_AURAAPPLICATIONS = ObjectFields.OBJECT_END + 0x1AC,
+        UNIT_FIELD_AURASTATE = ObjectFields.OBJECT_END + 0x1DC,
+        UNIT_FIELD_BASEATTACKTIME = ObjectFields.OBJECT_END + 0x1E0,
+        UNIT_FIELD_RANGEDATTACKTIME = ObjectFields.OBJECT_END + 0x1E8,
+        UNIT_FIELD_BOUNDINGRADIUS = ObjectFields.OBJECT_END + 0x1EC,
+        UNIT_FIELD_COMBATREACH = ObjectFields.OBJECT_END + 0x1F0,
+        UNIT_FIELD_DISPLAYID = ObjectFields.OBJECT_END + 0x1F4,
+        UNIT_FIELD_NATIVEDISPLAYID = ObjectFields.OBJECT_END + 0x1F8,
+        UNIT_FIELD_MOUNTDISPLAYID = ObjectFields.OBJECT_END + 0x1FC,
+        UNIT_FIELD_MINDAMAGE = ObjectFields.OBJECT_END + 0x200,
+        UNIT_FIELD_MAXDAMAGE = ObjectFields.OBJECT_END + 0x204,
+        UNIT_FIELD_MINOFFHANDDAMAGE = ObjectFields.OBJECT_END + 0x208,
+        UNIT_FIELD_MAXOFFHANDDAMAGE = ObjectFields.OBJECT_END + 0x20C,
+        UNIT_FIELD_BYTES_1 = ObjectFields.OBJECT_END + 0x210,
+        UNIT_FIELD_PETNUMBER = ObjectFields.OBJECT_END + 0x214,
+        UNIT_FIELD_PET_NAME_TIMESTAMP = ObjectFields.OBJECT_END + 0x218,
+        UNIT_FIELD_PETEXPERIENCE = ObjectFields.OBJECT_END + 0x21C,
+        UNIT_FIELD_PETNEXTLEVELEXP = ObjectFields.OBJECT_END + 0x220,
+        UNIT_DYNAMIC_FLAGS = ObjectFields.OBJECT_END + 0x224,
+        UNIT_CHANNEL_SPELL = ObjectFields.OBJECT_END + 0x228,
+        UNIT_MOD_CAST_SPEED = ObjectFields.OBJECT_END + 0x22C,
+        UNIT_CREATED_BY_SPELL = ObjectFields.OBJECT_END + 0x230,
+        UNIT_NPC_FLAGS = ObjectFields.OBJECT_END + 0x234,
+        UNIT_NPC_EMOTESTATE = ObjectFields.OBJECT_END + 0x238,
+        UNIT_TRAINING_POINTS = ObjectFields.OBJECT_END + 0x23C,
+        UNIT_FIELD_STAT0 = ObjectFields.OBJECT_END + 0x240,
+        UNIT_FIELD_STAT1 = ObjectFields.OBJECT_END + 0x244,
+        UNIT_FIELD_STAT2 = ObjectFields.OBJECT_END + 0x248,
+        UNIT_FIELD_STAT3 = ObjectFields.OBJECT_END + 0x24C,
+        UNIT_FIELD_STAT4 = ObjectFields.OBJECT_END + 0x250,
+        UNIT_FIELD_RESISTANCES = ObjectFields.OBJECT_END + 0x254,
+        UNIT_FIELD_BASE_MANA = ObjectFields.OBJECT_END + 0x270,
+        UNIT_FIELD_BASE_HEALTH = ObjectFields.OBJECT_END + 0x274,
+        UNIT_FIELD_BYTES_2 = ObjectFields.OBJECT_END + 0x278,
+        UNIT_FIELD_ATTACK_POWER = ObjectFields.OBJECT_END + 0x27C,
+        UNIT_FIELD_ATTACK_POWER_MODS = ObjectFields.OBJECT_END + 0x280,
+        UNIT_FIELD_ATTACK_POWER_MULTIPLIER = ObjectFields.OBJECT_END + 0x284,
+        UNIT_FIELD_RANGED_ATTACK_POWER = ObjectFields.OBJECT_END + 0x288,
+        UNIT_FIELD_RANGED_ATTACK_POWER_MODS = ObjectFields.OBJECT_END + 0x28C,
+        UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER = ObjectFields.OBJECT_END + 0x290,
+        UNIT_FIELD_MINRANGEDDAMAGE = ObjectFields.OBJECT_END + 0x294,
+        UNIT_FIELD_MAXRANGEDDAMAGE = ObjectFields.OBJECT_END + 0x298,
+        UNIT_FIELD_POWER_COST_MODIFIER = ObjectFields.OBJECT_END + 0x29C,
+        UNIT_FIELD_POWER_COST_MULTIPLIER = ObjectFields.OBJECT_END + 0x2B8,
+        UNIT_FIELD_PADDING = ObjectFields.OBJECT_END + 0x2D4,
+        UNIT_END = ObjectFields.OBJECT_END + 0x2D8
+}
+
+internal enum ItemFields
+{
+        ITEM_FIELD_OWNER = ObjectFields.OBJECT_END + 0x0,
+        ITEM_FIELD_CONTAINED = ObjectFields.OBJECT_END + 0x8,
+        ITEM_FIELD_CREATOR = ObjectFields.OBJECT_END + 0x10,
+        ITEM_FIELD_GIFTCREATOR = ObjectFields.OBJECT_END + 0x18,
+        ITEM_FIELD_STACK_COUNT = ObjectFields.OBJECT_END + 0x20,
+        ITEM_FIELD_DURATION = ObjectFields.OBJECT_END + 0x24,
+        ITEM_FIELD_SPELL_CHARGES = ObjectFields.OBJECT_END + 0x28,
+        ITEM_FIELD_FLAGS = ObjectFields.OBJECT_END + 0x3C,
+        ITEM_FIELD_ENCHANTMENT = ObjectFields.OBJECT_END + 0x40,
+        ITEM_FIELD_PROPERTY_SEED = ObjectFields.OBJECT_END + 0x94,
+        ITEM_FIELD_RANDOM_PROPERTIES_ID = ObjectFields.OBJECT_END + 0x98,
+        ITEM_FIELD_ITEM_TEXT_ID = ObjectFields.OBJECT_END + 0x9C,
+        ITEM_FIELD_DURABILITY = ObjectFields.OBJECT_END + 0xA0,
+        ITEM_FIELD_MAXDURABILITY = ObjectFields.OBJECT_END + 0xA4,
+        ITEM_END = ObjectFields.OBJECT_END + 0xA8
+}
+
+internal enum PlayerFields
+{
+        PLAYER_DUEL_ARBITER = UnitFields.UNIT_END + 0x0,
+        PLAYER_FLAGS = UnitFields.UNIT_END + 0x8,
+        PLAYER_GUILDID = UnitFields.UNIT_END + 0xC,
+        PLAYER_GUILDRANK = UnitFields.UNIT_END + 0x10,
+        PLAYER_BYTES = UnitFields.UNIT_END + 0x14,
+        PLAYER_BYTES_2 = UnitFields.UNIT_END + 0x18,
+        PLAYER_BYTES_3 = UnitFields.UNIT_END + 0x1C,
+        PLAYER_DUEL_TEAM = UnitFields.UNIT_END + 0x20,
+        PLAYER_GUILD_TIMESTAMP = UnitFields.UNIT_END + 0x24,
+        PLAYER_QUEST_LOG_1_1 = UnitFields.UNIT_END + 0x28,
+        PLAYER_QUEST_LOG_1_2 = UnitFields.UNIT_END + 0x2C,
+        PLAYER_QUEST_LOG_2_1 = UnitFields.UNIT_END + 0x34,
+        PLAYER_QUEST_LOG_2_2 = UnitFields.UNIT_END + 0x38,
+        PLAYER_QUEST_LOG_3_1 = UnitFields.UNIT_END + 0x40,
+        PLAYER_QUEST_LOG_3_2 = UnitFields.UNIT_END + 0x44,
+        PLAYER_QUEST_LOG_4_1 = UnitFields.UNIT_END + 0x4C,
+        PLAYER_QUEST_LOG_4_2 = UnitFields.UNIT_END + 0x50,
+        PLAYER_QUEST_LOG_5_1 = UnitFields.UNIT_END + 0x58,
+        PLAYER_QUEST_LOG_5_2 = UnitFields.UNIT_END + 0x5C,
+        PLAYER_QUEST_LOG_6_1 = UnitFields.UNIT_END + 0x64,
+        PLAYER_QUEST_LOG_6_2 = UnitFields.UNIT_END + 0x68,
+        PLAYER_QUEST_LOG_7_1 = UnitFields.UNIT_END + 0x70,
+        PLAYER_QUEST_LOG_7_2 = UnitFields.UNIT_END + 0x74,
+        PLAYER_QUEST_LOG_8_1 = UnitFields.UNIT_END + 0x7C,
+        PLAYER_QUEST_LOG_8_2 = UnitFields.UNIT_END + 0x80,
+        PLAYER_QUEST_LOG_9_1 = UnitFields.UNIT_END + 0x88,
+        PLAYER_QUEST_LOG_9_2 = UnitFields.UNIT_END + 0x8C,
+        PLAYER_QUEST_LOG_10_1 = UnitFields.UNIT_END + 0x94,
+        PLAYER_QUEST_LOG_10_2 = UnitFields.UNIT_END + 0x98,
+        PLAYER_QUEST_LOG_11_1 = UnitFields.UNIT_END + 0xA0,
+        PLAYER_QUEST_LOG_11_2 = UnitFields.UNIT_END + 0xA4,
+        PLAYER_QUEST_LOG_12_1 = UnitFields.UNIT_END + 0xAC,
+        PLAYER_QUEST_LOG_12_2 = UnitFields.UNIT_END + 0xB0,
+        PLAYER_QUEST_LOG_13_1 = UnitFields.UNIT_END + 0xB8,
+        PLAYER_QUEST_LOG_13_2 = UnitFields.UNIT_END + 0xBC,
+        PLAYER_QUEST_LOG_14_1 = UnitFields.UNIT_END + 0xC4,
+        PLAYER_QUEST_LOG_14_2 = UnitFields.UNIT_END + 0xC8,
+        PLAYER_QUEST_LOG_15_1 = UnitFields.UNIT_END + 0xD0,
+        PLAYER_QUEST_LOG_15_2 = UnitFields.UNIT_END + 0xD4,
+        PLAYER_QUEST_LOG_16_1 = UnitFields.UNIT_END + 0xDC,
+        PLAYER_QUEST_LOG_16_2 = UnitFields.UNIT_END + 0xE0,
+        PLAYER_QUEST_LOG_17_1 = UnitFields.UNIT_END + 0xE8,
+        PLAYER_QUEST_LOG_17_2 = UnitFields.UNIT_END + 0xEC,
+        PLAYER_QUEST_LOG_18_1 = UnitFields.UNIT_END + 0xF4,
+        PLAYER_QUEST_LOG_18_2 = UnitFields.UNIT_END + 0xF8,
+        PLAYER_QUEST_LOG_19_1 = UnitFields.UNIT_END + 0x100,
+        PLAYER_QUEST_LOG_19_2 = UnitFields.UNIT_END + 0x104,
+        PLAYER_QUEST_LOG_20_1 = UnitFields.UNIT_END + 0x10C,
+        PLAYER_QUEST_LOG_20_2 = UnitFields.UNIT_END + 0x110,
+        PLAYER_VISIBLE_ITEM_1_CREATOR = UnitFields.UNIT_END + 0x118,
+        PLAYER_VISIBLE_ITEM_1_0 = UnitFields.UNIT_END + 0x120,
+        PLAYER_VISIBLE_ITEM_1_PROPERTIES = UnitFields.UNIT_END + 0x140,
+        PLAYER_VISIBLE_ITEM_1_PAD = UnitFields.UNIT_END + 0x144,
+        PLAYER_VISIBLE_ITEM_2_CREATOR = UnitFields.UNIT_END + 0x148,
+        PLAYER_VISIBLE_ITEM_2_0 = UnitFields.UNIT_END + 0x150,
+        PLAYER_VISIBLE_ITEM_2_PROPERTIES = UnitFields.UNIT_END + 0x170,
+        PLAYER_VISIBLE_ITEM_2_PAD = UnitFields.UNIT_END + 0x174,
+        PLAYER_VISIBLE_ITEM_3_CREATOR = UnitFields.UNIT_END + 0x178,
+        PLAYER_VISIBLE_ITEM_3_0 = UnitFields.UNIT_END + 0x180,
+        PLAYER_VISIBLE_ITEM_3_PROPERTIES = UnitFields.UNIT_END + 0x1A0,
+        PLAYER_VISIBLE_ITEM_3_PAD = UnitFields.UNIT_END + 0x1A4,
+        PLAYER_VISIBLE_ITEM_4_CREATOR = UnitFields.UNIT_END + 0x1A8,
+        PLAYER_VISIBLE_ITEM_4_0 = UnitFields.UNIT_END + 0x1B0,
+        PLAYER_VISIBLE_ITEM_4_PROPERTIES = UnitFields.UNIT_END + 0x1D0,
+        PLAYER_VISIBLE_ITEM_4_PAD = UnitFields.UNIT_END + 0x1D4,
+        PLAYER_VISIBLE_ITEM_5_CREATOR = UnitFields.UNIT_END + 0x1D8,
+        PLAYER_VISIBLE_ITEM_5_0 = UnitFields.UNIT_END + 0x1E0,
+        PLAYER_VISIBLE_ITEM_5_PROPERTIES = UnitFields.UNIT_END + 0x200,
+        PLAYER_VISIBLE_ITEM_5_PAD = UnitFields.UNIT_END + 0x204,
+        PLAYER_VISIBLE_ITEM_6_CREATOR = UnitFields.UNIT_END + 0x208,
+        PLAYER_VISIBLE_ITEM_6_0 = UnitFields.UNIT_END + 0x210,
+        PLAYER_VISIBLE_ITEM_6_PROPERTIES = UnitFields.UNIT_END + 0x230,
+        PLAYER_VISIBLE_ITEM_6_PAD = UnitFields.UNIT_END + 0x234,
+        PLAYER_VISIBLE_ITEM_7_CREATOR = UnitFields.UNIT_END + 0x238,
+        PLAYER_VISIBLE_ITEM_7_0 = UnitFields.UNIT_END + 0x240,
+        PLAYER_VISIBLE_ITEM_7_PROPERTIES = UnitFields.UNIT_END + 0x260,
+        PLAYER_VISIBLE_ITEM_7_PAD = UnitFields.UNIT_END + 0x264,
+        PLAYER_VISIBLE_ITEM_8_CREATOR = UnitFields.UNIT_END + 0x268,
+        PLAYER_VISIBLE_ITEM_8_0 = UnitFields.UNIT_END + 0x270,
+        PLAYER_VISIBLE_ITEM_8_PROPERTIES = UnitFields.UNIT_END + 0x290,
+        PLAYER_VISIBLE_ITEM_8_PAD = UnitFields.UNIT_END + 0x294,
+        PLAYER_VISIBLE_ITEM_9_CREATOR = UnitFields.UNIT_END + 0x298,
+        PLAYER_VISIBLE_ITEM_9_0 = UnitFields.UNIT_END + 0x2A0,
+        PLAYER_VISIBLE_ITEM_9_PROPERTIES = UnitFields.UNIT_END + 0x2C0,
+        PLAYER_VISIBLE_ITEM_9_PAD = UnitFields.UNIT_END + 0x2C4,
+        PLAYER_VISIBLE_ITEM_10_CREATOR = UnitFields.UNIT_END + 0x2C8,
+        PLAYER_VISIBLE_ITEM_10_0 = UnitFields.UNIT_END + 0x2D0,
+        PLAYER_VISIBLE_ITEM_10_PROPERTIES = UnitFields.UNIT_END + 0x2F0,
+        PLAYER_VISIBLE_ITEM_10_PAD = UnitFields.UNIT_END + 0x2F4,
+        PLAYER_VISIBLE_ITEM_11_CREATOR = UnitFields.UNIT_END + 0x2F8,
+        PLAYER_VISIBLE_ITEM_11_0 = UnitFields.UNIT_END + 0x300,
+        PLAYER_VISIBLE_ITEM_11_PROPERTIES = UnitFields.UNIT_END + 0x320,
+        PLAYER_VISIBLE_ITEM_11_PAD = UnitFields.UNIT_END + 0x324,
+        PLAYER_VISIBLE_ITEM_12_CREATOR = UnitFields.UNIT_END + 0x328,
+        PLAYER_VISIBLE_ITEM_12_0 = UnitFields.UNIT_END + 0x330,
+        PLAYER_VISIBLE_ITEM_12_PROPERTIES = UnitFields.UNIT_END + 0x350,
+        PLAYER_VISIBLE_ITEM_12_PAD = UnitFields.UNIT_END + 0x354,
+        PLAYER_VISIBLE_ITEM_13_CREATOR = UnitFields.UNIT_END + 0x358,
+        PLAYER_VISIBLE_ITEM_13_0 = UnitFields.UNIT_END + 0x360,
+        PLAYER_VISIBLE_ITEM_13_PROPERTIES = UnitFields.UNIT_END + 0x380,
+        PLAYER_VISIBLE_ITEM_13_PAD = UnitFields.UNIT_END + 0x384,
+        PLAYER_VISIBLE_ITEM_14_CREATOR = UnitFields.UNIT_END + 0x388,
+        PLAYER_VISIBLE_ITEM_14_0 = UnitFields.UNIT_END + 0x390,
+        PLAYER_VISIBLE_ITEM_14_PROPERTIES = UnitFields.UNIT_END + 0x3B0,
+        PLAYER_VISIBLE_ITEM_14_PAD = UnitFields.UNIT_END + 0x3B4,
+        PLAYER_VISIBLE_ITEM_15_CREATOR = UnitFields.UNIT_END + 0x3B8,
+        PLAYER_VISIBLE_ITEM_15_0 = UnitFields.UNIT_END + 0x3C0,
+        PLAYER_VISIBLE_ITEM_15_PROPERTIES = UnitFields.UNIT_END + 0x3E0,
+        PLAYER_VISIBLE_ITEM_15_PAD = UnitFields.UNIT_END + 0x3E4,
+        PLAYER_VISIBLE_ITEM_16_CREATOR = UnitFields.UNIT_END + 0x3E8,
+        PLAYER_VISIBLE_ITEM_16_0 = UnitFields.UNIT_END + 0x3F0,
+        PLAYER_VISIBLE_ITEM_16_PROPERTIES = UnitFields.UNIT_END + 0x410,
+        PLAYER_VISIBLE_ITEM_16_PAD = UnitFields.UNIT_END + 0x414,
+        PLAYER_VISIBLE_ITEM_17_CREATOR = UnitFields.UNIT_END + 0x418,
+        PLAYER_VISIBLE_ITEM_17_0 = UnitFields.UNIT_END + 0x420,
+        PLAYER_VISIBLE_ITEM_17_PROPERTIES = UnitFields.UNIT_END + 0x440,
+        PLAYER_VISIBLE_ITEM_17_PAD = UnitFields.UNIT_END + 0x444,
+        PLAYER_VISIBLE_ITEM_18_CREATOR = UnitFields.UNIT_END + 0x448,
+        PLAYER_VISIBLE_ITEM_18_0 = UnitFields.UNIT_END + 0x450,
+        PLAYER_VISIBLE_ITEM_18_PROPERTIES = UnitFields.UNIT_END + 0x470,
+        PLAYER_VISIBLE_ITEM_18_PAD = UnitFields.UNIT_END + 0x474,
+        PLAYER_VISIBLE_ITEM_19_CREATOR = UnitFields.UNIT_END + 0x478,
+        PLAYER_VISIBLE_ITEM_19_0 = UnitFields.UNIT_END + 0x480,
+        PLAYER_VISIBLE_ITEM_19_PROPERTIES = UnitFields.UNIT_END + 0x4A0,
+        PLAYER_VISIBLE_ITEM_19_PAD = UnitFields.UNIT_END + 0x4A4,
+        PLAYER_FIELD_INV_SLOT_HEAD = UnitFields.UNIT_END + 0x4A8,
+        PLAYER_FIELD_PACK_SLOT_1 = UnitFields.UNIT_END + 0x560,
+        PLAYER_FIELD_BANK_SLOT_1 = UnitFields.UNIT_END + 0x5E0,
+        PLAYER_FIELD_BANKBAG_SLOT_1 = UnitFields.UNIT_END + 0x6A0,
+        PLAYER_FIELD_VENDORBUYBACK_SLOT_1 = UnitFields.UNIT_END + 0x6D0,
+        PLAYER_FIELD_KEYRING_SLOT_1 = UnitFields.UNIT_END + 0x730,
+        PLAYER_FARSIGHT = UnitFields.UNIT_END + 0x830,
+        PLAYER__FIELD_COMBO_TARGET = UnitFields.UNIT_END + 0x838,
+        PLAYER_XP = UnitFields.UNIT_END + 0x840,
+        PLAYER_NEXT_LEVEL_XP = UnitFields.UNIT_END + 0x844,
+        PLAYER_SKILL_INFO_1_1 = UnitFields.UNIT_END + 0x848,
+        PLAYER_CHARACTER_POINTS1 = UnitFields.UNIT_END + 0xE48,
+        PLAYER_CHARACTER_POINTS2 = UnitFields.UNIT_END + 0xE4C,
+        PLAYER_TRACK_CREATURES = UnitFields.UNIT_END + 0xE50,
+        PLAYER_TRACK_RESOURCES = UnitFields.UNIT_END + 0xE54,
+        PLAYER_BLOCK_PERCENTAGE = UnitFields.UNIT_END + 0xE58,
+        PLAYER_DODGE_PERCENTAGE = UnitFields.UNIT_END + 0xE5C,
+        PLAYER_PARRY_PERCENTAGE = UnitFields.UNIT_END + 0xE60,
+        PLAYER_CRIT_PERCENTAGE = UnitFields.UNIT_END + 0xE64,
+        PLAYER_RANGED_CRIT_PERCENTAGE = UnitFields.UNIT_END + 0xE68,
+        PLAYER_EXPLORED_ZONES_1 = UnitFields.UNIT_END + 0xE6C,
+        PLAYER_REST_STATE_EXPERIENCE = UnitFields.UNIT_END + 0xF6C,
+        PLAYER_FIELD_COINAGE = UnitFields.UNIT_END + 0xF70,
+        PLAYER_FIELD_POSSTAT0 = UnitFields.UNIT_END + 0xF74,
+        PLAYER_FIELD_POSSTAT1 = UnitFields.UNIT_END + 0xF78,
+        PLAYER_FIELD_POSSTAT2 = UnitFields.UNIT_END + 0xF7C,
+        PLAYER_FIELD_POSSTAT3 = UnitFields.UNIT_END + 0xF80,
+        PLAYER_FIELD_POSSTAT4 = UnitFields.UNIT_END + 0xF84,
+        PLAYER_FIELD_NEGSTAT0 = UnitFields.UNIT_END + 0xF88,
+        PLAYER_FIELD_NEGSTAT1 = UnitFields.UNIT_END + 0xF8C,
+        PLAYER_FIELD_NEGSTAT2 = UnitFields.UNIT_END + 0xF90,
+        PLAYER_FIELD_NEGSTAT3 = UnitFields.UNIT_END + 0xF94,
+        PLAYER_FIELD_NEGSTAT4 = UnitFields.UNIT_END + 0xF98,
+        PLAYER_FIELD_RESISTANCEBUFFMODSPOSITIVE = UnitFields.UNIT_END + 0xF9C,
+        PLAYER_FIELD_RESISTANCEBUFFMODSNEGATIVE = UnitFields.UNIT_END + 0xFB8,
+        PLAYER_FIELD_MOD_DAMAGE_DONE_POS = UnitFields.UNIT_END + 0xFD4,
+        PLAYER_FIELD_MOD_DAMAGE_DONE_NEG = UnitFields.UNIT_END + 0xFF0,
+        PLAYER_FIELD_MOD_DAMAGE_DONE_PCT = UnitFields.UNIT_END + 0x100C,
+        PLAYER_FIELD_BYTES = UnitFields.UNIT_END + 0x1028,
+        PLAYER_AMMO_ID = UnitFields.UNIT_END + 0x102C,
+        PLAYER_SELF_RES_SPELL = UnitFields.UNIT_END + 0x1030,
+        PLAYER_FIELD_PVP_MEDALS = UnitFields.UNIT_END + 0x1034,
+        PLAYER_FIELD_BUYBACK_PRICE_1 = UnitFields.UNIT_END + 0x1038,
+        PLAYER_FIELD_BUYBACK_TIMESTAMP_1 = UnitFields.UNIT_END + 0x1068,
+        PLAYER_FIELD_SESSION_KILLS = UnitFields.UNIT_END + 0x1098,
+        PLAYER_FIELD_YESTERDAY_KILLS = UnitFields.UNIT_END + 0x109C,
+        PLAYER_FIELD_LAST_WEEK_KILLS = UnitFields.UNIT_END + 0x10A0,
+        PLAYER_FIELD_THIS_WEEK_KILLS = UnitFields.UNIT_END + 0x10A4,
+        PLAYER_FIELD_THIS_WEEK_CONTRIBUTION = UnitFields.UNIT_END + 0x10A8,
+        PLAYER_FIELD_LIFETIME_HONORBALE_KILLS = UnitFields.UNIT_END + 0x10AC,
+        PLAYER_FIELD_LIFETIME_DISHONORBALE_KILLS = UnitFields.UNIT_END + 0x10B0,
+        PLAYER_FIELD_YESTERDAY_CONTRIBUTION = UnitFields.UNIT_END + 0x10B4,
+        PLAYER_FIELD_LAST_WEEK_CONTRIBUTION = UnitFields.UNIT_END + 0x10B8,
+        PLAYER_FIELD_LAST_WEEK_RANK = UnitFields.UNIT_END + 0x10BC,
+        PLAYER_FIELD_BYTES2 = UnitFields.UNIT_END + 0x10C0,
+        PLAYER_FIELD_WATCHED_FACTION_INDEX = UnitFields.UNIT_END + 0x10C4,
+        PLAYER_FIELD_COMBAT_RATING_1 = UnitFields.UNIT_END + 0x10C8,
+        PLAYER_END = UnitFields.UNIT_END + 0x1118
+}
+
+internal enum ContainerFields
+{
+        CONTAINER_FIELD_NUM_SLOTS = ItemFields.ITEM_END + 0x0,
+        CONTAINER_ALIGN_PAD = ItemFields.ITEM_END + 0x4,
+        CONTAINER_FIELD_SLOT_1 = ItemFields.ITEM_END + 0x8,
+        CONTAINER_END = ItemFields.ITEM_END + 0x128
+}
+
+internal enum GameObjectFields
+{
+        GAMEOBJECT_DISPLAYID = ObjectFields.OBJECT_END + 0x8,
+        GAMEOBJECT_FLAGS = ObjectFields.OBJECT_END + 0xC,
+        GAMEOBJECT_ROTATION = ObjectFields.OBJECT_END + 0x10,
+        GAMEOBJECT_STATE = ObjectFields.OBJECT_END + 0x20,
+        GAMEOBJECT_POS_X = ObjectFields.OBJECT_END + 0x24,
+        GAMEOBJECT_POS_Y = ObjectFields.OBJECT_END + 0x28,
+        GAMEOBJECT_POS_Z = ObjectFields.OBJECT_END + 0x2C,
+        GAMEOBJECT_FACING = ObjectFields.OBJECT_END + 0x30,
+        GAMEOBJECT_DYN_FLAGS = ObjectFields.OBJECT_END + 0x34,
+        GAMEOBJECT_FACTION = ObjectFields.OBJECT_END + 0x38,
+        GAMEOBJECT_TYPE_ID = ObjectFields.OBJECT_END + 0x3C,
+        GAMEOBJECT_LEVEL = ObjectFields.OBJECT_END + 0x40,
+        GAMEOBJECT_ARTKIT = ObjectFields.OBJECT_END + 0x44,
+        GAMEOBJECT_ANIMPROGRESS = ObjectFields.OBJECT_END + 0x48,
+        GAMEOBJECT_PADDING = ObjectFields.OBJECT_END + 0x4C,
+        GAMEOBJECT_END = ObjectFields.OBJECT_END + 0x50
+}
+
+internal enum DynamicObjectFields
+{
+        DYNAMICOBJECT_CASTER = ObjectFields.OBJECT_END + 0x0,
+        DYNAMICOBJECT_BYTES = ObjectFields.OBJECT_END + 0x8,
+        DYNAMICOBJECT_SPELLID = ObjectFields.OBJECT_END + 0xC,
+        DYNAMICOBJECT_RADIUS = ObjectFields.OBJECT_END + 0x10,
+        DYNAMICOBJECT_POS_X = ObjectFields.OBJECT_END + 0x14,
+        DYNAMICOBJECT_POS_Y = ObjectFields.OBJECT_END + 0x18,
+        DYNAMICOBJECT_POS_Z = ObjectFields.OBJECT_END + 0x1C,
+        DYNAMICOBJECT_FACING = ObjectFields.OBJECT_END + 0x20,
+        DYNAMICOBJECT_PAD = ObjectFields.OBJECT_END + 0x24,
+        DYNAMICOBJECT_END = ObjectFields.OBJECT_END + 0x28
+}
+
+internal enum CorpseFields
+{
+        CORPSE_FIELD_OWNER = ObjectFields.OBJECT_END + 0x0,
+        CORPSE_FIELD_FACING = ObjectFields.OBJECT_END + 0x8,
+        CORPSE_FIELD_POS_X = ObjectFields.OBJECT_END + 0xC,
+        CORPSE_FIELD_POS_Y = ObjectFields.OBJECT_END + 0x10,
+        CORPSE_FIELD_POS_Z = ObjectFields.OBJECT_END + 0x14,
+        CORPSE_FIELD_DISPLAY_ID = ObjectFields.OBJECT_END + 0x18,
+        CORPSE_FIELD_ITEM = ObjectFields.OBJECT_END + 0x1C,
+        CORPSE_FIELD_BYTES_1 = ObjectFields.OBJECT_END + 0x68,
+        CORPSE_FIELD_BYTES_2 = ObjectFields.OBJECT_END + 0x6C,
+        CORPSE_FIELD_GUILD = ObjectFields.OBJECT_END + 0x70,
+        CORPSE_FIELD_FLAGS = ObjectFields.OBJECT_END + 0x74,
+        CORPSE_FIELD_DYNAMIC_FLAGS = ObjectFields.OBJECT_END + 0x78,
+        CORPSE_FIELD_PAD = ObjectFields.OBJECT_END + 0x7C,
+        CORPSE_END = ObjectFields.OBJECT_END + 0x80
+}
+
+Does anyone have CTM base address and the GUID offset?
+
+Actually, I have the CTM x,y,z addresses, and I tried to dissect the memory structure around them with CE but couldnt find anything that looked like a GUID.
+I also scanned the GUID of my target after i CTMed on it, but I couldnt find anyhting.
+
+this is how a GUID looks like right? 0xF1300002C1000F23
+
+I tried with the GUID offset from the wowdev site but all I get is something like this: 0080B188C314C000.. and it never changes when I CTM on different mobs
+
+can anyone help me abit?
+
+edit: found it 0xC4D980
+
+bool getCursorWorldPosition(Vec3* positionOut, float* distanceOut)
+{
+	CGWorldFrame* frame = getCurrentWorldFrame();
+	if (frame == nullptr)
+		return false;
+
+	if (frame->data == nullptr)
+		return false;
+
+	float const mouseX = frame->data->mouseX;
+	float const mouseY = frame->data->mouseY;
+
+	// TODO: Sanity check on the values.
+
+	float mouseOutX, mouseOutY;
+	NDCtoDDC(&mouseOutX, &mouseOutY, mouseX, mouseY);
+
+	HitTestResult hitTest;
+	frame->hitTestPoint(mouseOutX, mouseOutY, &hitTest);
+
+	positionOut->x = hitTest.point.x;
+	positionOut->y = hitTest.point.y;
+	positionOut->z = hitTest.point.z;
+	*distanceOut = hitTest.distance;
+	return true;
+}
+	
+CGWorldFrame* getCurrentWorldFrame()
+{
+	return *reinterpret_cast<CGWorldFrame**>(0x00B4B2BC); //-V566
+}
+
+struct CGWorldFrame
+{
+	uint32 hitTestPoint(float mouseX, float mouseY, HitTestResult* resultOut);
+
+private:
+	uint8 fill[0xa0];
+
+public:
+	CGWorldFrameUnk* data;
+};
+	
+struct CGWorldFrameUnk
+{
+private:
+	uint8 fill[0x1118];
+
+public:
+	float mouseX;
+	float mouseY;
+};
+	
+struct HitTestResult
+{
+private:
+	uint32 unk1;
+	uint32 unk2;
+
+public:
+	Vec3 point;
+	float distance;
+
+private:
+	uint8 filler[0x100];
+};
+
+typedef uint32 (__fastcall * tNDCtoDDC)(float* outx, float* outy, float inx, float iny); // 0x0041AD80
+
+void ClickToMove_Hook(float x, float y, float z)
+{
+  if (ClickToTeleportEnabled)
+    Teleport(x, y, z);
+  else
+    ClickToMove_Original(x, y, z)
+}
+
+Hooking CGWorldFrame::PerformDefaultAction is a good way to realize click2port. Reverse it and you'll know how to grab x/y/z.
+0x00481F60
+
+"AutoStoreAllLootItems", 0x4C1FA0
+"CGBuffBar__m_buffs", 0xBC6040
+"CGBuffBar__m_durations", 0xBC5F68
+"CGChat__AddChatMessage", 0x49A870
+"CGGameUI__ClearTarget", 0x493910
+"CGGameUI__LeftClick", 0x4925D0
+"CGGameUI__RightClick", 0x492820
+"CGGameUI__m_lockedTarget", 0xB4E2D8
+"CGGameUI__m_player", 0xB41E30
+"CGGameUI__s_lastErrorString", 0xB4DA40
+"CGInputControl__GetActive", 0x5143E0
+"CGInputControl__SetControlBit", 0x5EE7F0
+"CGLootInfo__LootSlot", 0x4C2790
+"CGLootInfo__m_coins", 0xB71BA0
+"CGLootInfo__m_loot", 0xB71968
+"CGLootInfo__m_object", 0xB71B48
+"CGPartyInfo__m_leader", 0xBC75F8
+"CGPartyInfo__m_members", 0xBC6F48
+"CGSpellBook__m_knownSpells", 0xB700F0
+"CGSpellBook__m_petSpells", 0xB6F098
+"CGWorldFrame__RenderWorld", 0x482D70
+"CGWorldMap__m_currentContinent", 0x84506C
+"OsGetAsyncTimeMs", 0x42C010
+"Spell_C_CastSpell", 0x6E5AD0
+"Spell_C_CastSpellByID", 0x6E5A90
+"WOW_LOCALE_CURRENT_LANGUAGE", 0xC0E080
+"clientDB", 0xC0D53C
+"g_HardwareEvent", 0xCF4DA0
+"g_SpellDB", 0xC0D788
+"g_SpellDBTotalRows", 0xC0D78C
+"g_charClasses", 0xC0DEF4
+"g_charClassesCount", 0xC0DEF8
+"g_charRaces", 0xC0DEE0
+"g_charRacesCount", 0xC0DEE4
+"g_factionDB", 0xC0DD50
+"g_factionGroupDB", 0xC0DD3C
+"g_gameObjectDisplayInfoDB", 0xC0DCE4
+"g_itemDBCache", 0xC0E2A0
+"g_nameDBCache", 0xC0E228
+"g_slotNames", 0xC0DA00
+"g_slotNamesCount", 0xC0DA04
+"g_spellItemEnchantment", 0xC0D7D0
+"luaState", 0xCEEF74
+"lua_gettop", 0x6F3070
+"lua_tostring", 0x6F3690
+"s_containerDescriptors", 0xB431D8
+"s_corpseDescriptors", 0xB42B70
+"s_corpsePosition", 0xB4E284
+"s_curMgr", 0xB41414
+"s_currentWorldFrame", 0xAF3220
+"s_dynamicObjectDescriptors", 0xB42E80
+"s_gameObjectDescriptors", 0xB42FD0
+"s_itemDescriptors", 0xB4AE50
+"s_objDescriptors", 0xB4B230
+"s_playerDescriptors", 0xB43B68
+"s_unitDescriptors", 0xB49F90
+
+private uint CreatureCache
+{
+    get { return Memory.Magic.Read<uint>(BaseAddress + 0xB30); }
+}
+		
+public Enums.WoWCreatureType CreatureType
+{
+    get { return (Enums.WoWCreatureType)Memory.Magic.Read<int>(CreatureCache + 0x18); }
+}
+
+public Enums.WoWClassification Classification
+{
+    get { return (Enums.WoWClassification)Memory.Magic.Read<int>(CreatureCache + 0x20); }
+}
+
+public static void TargetUnit(ulong guid)
+{
+    uint num = Memory.Magic.AllocateMemory(8);
+    Memory.Magic.Write<ulong>(num, guid);
+    string[] asm =
+        {
+            "mov ecx, " + num,
+            "call " + 0x489A40,
+            "retn"
+        };
+    Memory.Magic.Executor.Execute(asm);
+    Memory.Magic.FreeMemory(num);
+}
+
+public enum CreatureType
+{
+    Unknown = 0,
+    Beast,
+    Dragon,
+    Demon,
+    Elemental,
+    Giant,
+    Undead,
+    Humanoid,
+    Critter,
+    Mechanical,
+    NotSpecified,
+    Totem,
+    NonCombatPet,
+    GasCloud
+}
+
+public static byte[] LuaDoString(string Command)
+{
+	// Return Value
+	byte[] tempBytes = new byte[0];
+
+	try
+	{
+		//Allocate Memory For Command
+		var DoStringArg_Codecave = Memory.Memory.Allocate(Encoding.UTF8.GetBytes(Command).Length + 1);
+
+		//Execute Address
+		IntPtr FrameScript_Execute = new IntPtr(0x00704CD0);
+
+		//Write Command In Allocated Memory
+		Memory.WriteString(DoStringArg_Codecave.BaseAddress, Command, false);
+
+		var asm = new[] 
+		{
+			"mov ecx, " + DoStringArg_Codecave.BaseAddress,
+			"mov edx, " + DoStringArg_Codecave.BaseAddress,
+			"call " + FrameScript_Execute,
+			"retn",    
+		};
+
+		//Inject and Execute
+		tempBytes = Executor.Execute(asm);
+
+		//Free Memory Allocated For Command
+		Memory.Memory.Deallocate(DoStringArg_Codecave);
+	}
+	catch { }
+
+	return tempBytes;
+}
+
+lua0_pushvfstring 006F5990
+luaC_collectgarbage 006F7340
+luaC_link 006F7B20
+luaD_pcall 006F6960
+luaD_protectedparser 006F6A00
+luaF_newCclosure 006F9E70
+luaH_new 006FA4F0
+luaL_loadbuffer 006F5690
+luaL_openlib 006F4DC0
+luaM_realloc?? 006FC980
+luaS_newlstr 006F9D00
+luaV_gettable 006F7CF0
+luaZ_init 006FB4F0
+luaZ_lookahead 006FB4C0
+lua_call 006F4180
+lua_concat 006F44E0
+lua_cpcall 006F4260
+lua_dobuffer 006F57C0
+lua_dostring(x,x) 006F57F0
+lua_dump 006F4370
+lua_enablegc 006F43C0
+lua_error 006F4440
+lua_getfenv 006F3D50
+lua_getgccount 006F43F0
+lua_getmetatable 006F3CF0
+lua_gettop 006F3070
+lua_getupvalue 006F4660
+lua_isnumber(x,x) 006F34D0
+lua_isstring(x,x) 006F3510
+lua_load 006F4320
+lua_newtable 006F3C90
+lua_newuserdata 006F4560
+lua_pcall 006F41A0
+lua_pushboolean 006F39F0
+lua_pushcclosure 006F3920
+lua_pushfstring 006F38F0
+lua_pushlightuserdata 006F3A20
+lua_pushlstring 006F3840
+lua_pushnil(x) 006F37F0
+lua_pushnumber(x,x,x) 006F3810
+lua_pushstring(x,x) 006F3890
+lua_pushvfstring 006F38C0
+lua_rawseti 006F3EA0
+lua_setfenv 006F40D0
+lua_setmetatable 006F4020
+lua_settable 006F3E20
+lua_settop(x,x) 006F3080
+lua_tonumber(x,x) 006F3620
+lua_tostring(x,x) 006F3690
+lua_version 006F4430
+luaopen_math 007FB470
+luaopen_string 007FD810
+luaopen_table 007FBCD0
+
+/*----------------------------------
+WoW Offset Dumper 0.1 - IDC Script
+by kynox, updated by namreeb
+
+Credits:
+bobbysing, Patrick, Dominik, Azorbix
+-----------------------------------*/
+
+// Descriptors: 0x0083A2C0
+enum eObjectFields
+{
+	OBJECT_FIELD_GUID = 0x0,
+	OBJECT_FIELD_TYPE = 0x8,
+	OBJECT_FIELD_ENTRY = 0xC,
+	OBJECT_FIELD_SCALE_X = 0x10,
+	OBJECT_FIELD_PADDING = 0x14,
+	TOTAL_OBJECT_FIELDS = 0x5
+};
+
+// Descriptors: 0x0083A328
+enum eItemFields
+{
+	ITEM_FIELD_OWNER = 0x18,
+	ITEM_FIELD_CONTAINED = 0x20,
+	ITEM_FIELD_CREATOR = 0x28,
+	ITEM_FIELD_GIFTCREATOR = 0x30,
+	ITEM_FIELD_STACK_COUNT = 0x38,
+	ITEM_FIELD_DURATION = 0x3C,
+	ITEM_FIELD_SPELL_CHARGES = 0x40,
+	ITEM_FIELD_FLAGS = 0x54,
+	ITEM_FIELD_ENCHANTMENT = 0x58,
+	ITEM_FIELD_PROPERTY_SEED = 0xAC,
+	ITEM_FIELD_RANDOM_PROPERTIES_ID = 0xB0,
+	ITEM_FIELD_ITEM_TEXT_ID = 0xB4,
+	ITEM_FIELD_DURABILITY = 0xB8,
+	ITEM_FIELD_MAXDURABILITY = 0xBC,
+	TOTAL_ITEM_FIELDS = 0xE
+};
+
+// Descriptors: 0x0083A440
+enum eContainerFields
+{
+	CONTAINER_FIELD_NUM_SLOTS = 0x18,
+	CONTAINER_ALIGN_PAD = 0x1C,
+	CONTAINER_FIELD_SLOT_1 = 0x20,
+	TOTAL_CONTAINER_FIELDS = 0x3
+};
+
+// Descriptors: 0x0083B880
+enum eGameObjectFields
+{
+	OBJECT_FIELD_CREATED_BY = 0x18,
+	GAMEOBJECT_DISPLAYID = 0x20,
+	GAMEOBJECT_FLAGS = 0x24,
+	GAMEOBJECT_ROTATION = 0x28,
+	GAMEOBJECT_STATE = 0x38,
+	GAMEOBJECT_POS_X = 0x3C,
+	GAMEOBJECT_POS_Y = 0x40,
+	GAMEOBJECT_POS_Z = 0x44,
+	GAMEOBJECT_FACING = 0x48,
+	GAMEOBJECT_DYN_FLAGS = 0x4C,
+	GAMEOBJECT_FACTION = 0x50,
+	GAMEOBJECT_TYPE_ID = 0x54,
+	GAMEOBJECT_LEVEL = 0x58,
+	GAMEOBJECT_ARTKIT = 0x5C,
+	GAMEOBJECT_ANIMPROGRESS = 0x60,
+	GAMEOBJECT_PADDING = 0x64,
+	TOTAL_GAMEOBJECT_FIELDS = 0x10
+};
+
+// Descriptors: 0x0083B9C0
+enum eDynamicObjectFields
+{
+	DYNAMICOBJECT_CASTER = 0x18,
+	DYNAMICOBJECT_BYTES = 0x20,
+	DYNAMICOBJECT_SPELLID = 0x24,
+	DYNAMICOBJECT_RADIUS = 0x28,
+	DYNAMICOBJECT_POS_X = 0x2C,
+	DYNAMICOBJECT_POS_Y = 0x30,
+	DYNAMICOBJECT_POS_Z = 0x34,
+	DYNAMICOBJECT_FACING = 0x38,
+	DYNAMICOBJECT_PAD = 0x3C,
+	TOTAL_DYNAMICOBJECT_FIELDS = 0x9
+};
+
+// Descriptors: 0x0083BA78
+enum eCorpseFields
+{
+	CORPSE_FIELD_OWNER = 0x18,
+	CORPSE_FIELD_FACING = 0x20,
+	CORPSE_FIELD_POS_X = 0x24,
+	CORPSE_FIELD_POS_Y = 0x28,
+	CORPSE_FIELD_POS_Z = 0x2C,
+	CORPSE_FIELD_DISPLAY_ID = 0x30,
+	CORPSE_FIELD_ITEM = 0x34,
+	CORPSE_FIELD_BYTES_1 = 0x80,
+	CORPSE_FIELD_BYTES_2 = 0x84,
+	CORPSE_FIELD_GUILD = 0x88,
+	CORPSE_FIELD_FLAGS = 0x8C,
+	CORPSE_FIELD_DYNAMIC_FLAGS = 0x90,
+	CORPSE_FIELD_PAD = 0x94,
+	TOTAL_CORPSE_FIELDS = 0xD
+};
+
+// Descriptors: 0x0083A480
+enum eUnitFields
+{
+	UNIT_FIELD_CHARM = 0x18,
+	UNIT_FIELD_SUMMON = 0x20,
+	UNIT_FIELD_CHARMEDBY = 0x28,
+	UNIT_FIELD_SUMMONEDBY = 0x30,
+	UNIT_FIELD_CREATEDBY = 0x38,
+	UNIT_FIELD_TARGET = 0x40,
+	UNIT_FIELD_PERSUADED = 0x48,
+	UNIT_FIELD_CHANNEL_OBJECT = 0x50,
+	UNIT_FIELD_HEALTH = 0x58,
+	UNIT_FIELD_POWER1 = 0x5C,
+	UNIT_FIELD_POWER2 = 0x60,
+	UNIT_FIELD_POWER3 = 0x64,
+	UNIT_FIELD_POWER4 = 0x68,
+	UNIT_FIELD_POWER5 = 0x6C,
+	UNIT_FIELD_MAXHEALTH = 0x70,
+	UNIT_FIELD_MAXPOWER1 = 0x74,
+	UNIT_FIELD_MAXPOWER2 = 0x78,
+	UNIT_FIELD_MAXPOWER3 = 0x7C,
+	UNIT_FIELD_MAXPOWER4 = 0x80,
+	UNIT_FIELD_MAXPOWER5 = 0x84,
+	UNIT_FIELD_LEVEL = 0x88,
+	UNIT_FIELD_FACTIONTEMPLATE = 0x8C,
+	UNIT_FIELD_BYTES_0 = 0x90,
+	UNIT_VIRTUAL_ITEM_SLOT_DISPLAY = 0x94,
+	UNIT_VIRTUAL_ITEM_INFO = 0xA0,
+	UNIT_FIELD_FLAGS = 0xB8,
+	UNIT_FIELD_AURA = 0xBC,
+	UNIT_FIELD_AURAFLAGS = 0x17C,
+	UNIT_FIELD_AURALEVELS = 0x194,
+	UNIT_FIELD_AURAAPPLICATIONS = 0x1C4,
+	UNIT_FIELD_AURASTATE = 0x1F4,
+	UNIT_FIELD_BASEATTACKTIME = 0x1F8,
+	UNIT_FIELD_RANGEDATTACKTIME = 0x200,
+	UNIT_FIELD_BOUNDINGRADIUS = 0x204,
+	UNIT_FIELD_COMBATREACH = 0x208,
+	UNIT_FIELD_DISPLAYID = 0x20C,
+	UNIT_FIELD_NATIVEDISPLAYID = 0x210,
+	UNIT_FIELD_MOUNTDISPLAYID = 0x214,
+	UNIT_FIELD_MINDAMAGE = 0x218,
+	UNIT_FIELD_MAXDAMAGE = 0x21C,
+	UNIT_FIELD_MINOFFHANDDAMAGE = 0x220,
+	UNIT_FIELD_MAXOFFHANDDAMAGE = 0x224,
+	UNIT_FIELD_BYTES_1 = 0x228,
+	UNIT_FIELD_PETNUMBER = 0x22C,
+	UNIT_FIELD_PET_NAME_TIMESTAMP = 0x230,
+	UNIT_FIELD_PETEXPERIENCE = 0x234,
+	UNIT_FIELD_PETNEXTLEVELEXP = 0x238,
+	UNIT_DYNAMIC_FLAGS = 0x23C,
+	UNIT_CHANNEL_SPELL = 0x240,
+	UNIT_MOD_CAST_SPEED = 0x244,
+	UNIT_CREATED_BY_SPELL = 0x248,
+	UNIT_NPC_FLAGS = 0x24C,
+	UNIT_NPC_EMOTESTATE = 0x250,
+	UNIT_TRAINING_POINTS = 0x254,
+	UNIT_FIELD_STAT0 = 0x258,
+	UNIT_FIELD_STAT1 = 0x25C,
+	UNIT_FIELD_STAT2 = 0x260,
+	UNIT_FIELD_STAT3 = 0x264,
+	UNIT_FIELD_STAT4 = 0x268,
+	UNIT_FIELD_RESISTANCES = 0x26C,
+	UNIT_FIELD_BASE_MANA = 0x288,
+	UNIT_FIELD_BASE_HEALTH = 0x28C,
+	UNIT_FIELD_BYTES_2 = 0x290,
+	UNIT_FIELD_ATTACK_POWER = 0x294,
+	UNIT_FIELD_ATTACK_POWER_MODS = 0x298,
+	UNIT_FIELD_ATTACK_POWER_MULTIPLIER = 0x29C,
+	UNIT_FIELD_RANGED_ATTACK_POWER = 0x2A0,
+	UNIT_FIELD_RANGED_ATTACK_POWER_MODS = 0x2A4,
+	UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER = 0x2A8,
+	UNIT_FIELD_MINRANGEDDAMAGE = 0x2AC,
+	UNIT_FIELD_MAXRANGEDDAMAGE = 0x2B0,
+	UNIT_FIELD_POWER_COST_MODIFIER = 0x2B4,
+	UNIT_FIELD_POWER_COST_MULTIPLIER = 0x2D0,
+	UNIT_FIELD_PADDING = 0x2EC,
+	TOTAL_UNIT_FIELDS = 0x4A
+};
+
+// Descriptors: 0x0083AA48
+enum ePlayerFields
+{
+	PLAYER_DUEL_ARBITER = 0x2F0,
+	PLAYER_FLAGS = 0x2F8,
+	PLAYER_GUILDID = 0x2FC,
+	PLAYER_GUILDRANK = 0x300,
+	PLAYER_BYTES = 0x304,
+	PLAYER_BYTES_2 = 0x308,
+	PLAYER_BYTES_3 = 0x30C,
+	PLAYER_DUEL_TEAM = 0x310,
+	PLAYER_GUILD_TIMESTAMP = 0x314,
+	PLAYER_QUEST_LOG_1_1 = 0x318,
+	PLAYER_QUEST_LOG_1_2 = 0x31C,
+	PLAYER_QUEST_LOG_2_1 = 0x324,
+	PLAYER_QUEST_LOG_2_2 = 0x328,
+	PLAYER_QUEST_LOG_3_1 = 0x330,
+	PLAYER_QUEST_LOG_3_2 = 0x334,
+	PLAYER_QUEST_LOG_4_1 = 0x33C,
+	PLAYER_QUEST_LOG_4_2 = 0x340,
+	PLAYER_QUEST_LOG_5_1 = 0x348,
+	PLAYER_QUEST_LOG_5_2 = 0x34C,
+	PLAYER_QUEST_LOG_6_1 = 0x354,
+	PLAYER_QUEST_LOG_6_2 = 0x358,
+	PLAYER_QUEST_LOG_7_1 = 0x360,
+	PLAYER_QUEST_LOG_7_2 = 0x364,
+	PLAYER_QUEST_LOG_8_1 = 0x36C,
+	PLAYER_QUEST_LOG_8_2 = 0x370,
+	PLAYER_QUEST_LOG_9_1 = 0x378,
+	PLAYER_QUEST_LOG_9_2 = 0x37C,
+	PLAYER_QUEST_LOG_10_1 = 0x384,
+	PLAYER_QUEST_LOG_10_2 = 0x388,
+	PLAYER_QUEST_LOG_11_1 = 0x390,
+	PLAYER_QUEST_LOG_11_2 = 0x394,
+	PLAYER_QUEST_LOG_12_1 = 0x39C,
+	PLAYER_QUEST_LOG_12_2 = 0x3A0,
+	PLAYER_QUEST_LOG_13_1 = 0x3A8,
+	PLAYER_QUEST_LOG_13_2 = 0x3AC,
+	PLAYER_QUEST_LOG_14_1 = 0x3B4,
+	PLAYER_QUEST_LOG_14_2 = 0x3B8,
+	PLAYER_QUEST_LOG_15_1 = 0x3C0,
+	PLAYER_QUEST_LOG_15_2 = 0x3C4,
+	PLAYER_QUEST_LOG_16_1 = 0x3CC,
+	PLAYER_QUEST_LOG_16_2 = 0x3D0,
+	PLAYER_QUEST_LOG_17_1 = 0x3D8,
+	PLAYER_QUEST_LOG_17_2 = 0x3DC,
+	PLAYER_QUEST_LOG_18_1 = 0x3E4,
+	PLAYER_QUEST_LOG_18_2 = 0x3E8,
+	PLAYER_QUEST_LOG_19_1 = 0x3F0,
+	PLAYER_QUEST_LOG_19_2 = 0x3F4,
+	PLAYER_QUEST_LOG_20_1 = 0x3FC,
+	PLAYER_QUEST_LOG_20_2 = 0x400,
+	PLAYER_VISIBLE_ITEM_1_CREATOR = 0x408,
+	PLAYER_VISIBLE_ITEM_1_0 = 0x410,
+	PLAYER_VISIBLE_ITEM_1_PROPERTIES = 0x430,
+	PLAYER_VISIBLE_ITEM_1_PAD = 0x434,
+	PLAYER_VISIBLE_ITEM_2_CREATOR = 0x438,
+	PLAYER_VISIBLE_ITEM_2_0 = 0x440,
+	PLAYER_VISIBLE_ITEM_2_PROPERTIES = 0x460,
+	PLAYER_VISIBLE_ITEM_2_PAD = 0x464,
+	PLAYER_VISIBLE_ITEM_3_CREATOR = 0x468,
+	PLAYER_VISIBLE_ITEM_3_0 = 0x470,
+	PLAYER_VISIBLE_ITEM_3_PROPERTIES = 0x490,
+	PLAYER_VISIBLE_ITEM_3_PAD = 0x494,
+	PLAYER_VISIBLE_ITEM_4_CREATOR = 0x498,
+	PLAYER_VISIBLE_ITEM_4_0 = 0x4A0,
+	PLAYER_VISIBLE_ITEM_4_PROPERTIES = 0x4C0,
+	PLAYER_VISIBLE_ITEM_4_PAD = 0x4C4,
+	PLAYER_VISIBLE_ITEM_5_CREATOR = 0x4C8,
+	PLAYER_VISIBLE_ITEM_5_0 = 0x4D0,
+	PLAYER_VISIBLE_ITEM_5_PROPERTIES = 0x4F0,
+	PLAYER_VISIBLE_ITEM_5_PAD = 0x4F4,
+	PLAYER_VISIBLE_ITEM_6_CREATOR = 0x4F8,
+	PLAYER_VISIBLE_ITEM_6_0 = 0x500,
+	PLAYER_VISIBLE_ITEM_6_PROPERTIES = 0x520,
+	PLAYER_VISIBLE_ITEM_6_PAD = 0x524,
+	PLAYER_VISIBLE_ITEM_7_CREATOR = 0x528,
+	PLAYER_VISIBLE_ITEM_7_0 = 0x530,
+	PLAYER_VISIBLE_ITEM_7_PROPERTIES = 0x550,
+	PLAYER_VISIBLE_ITEM_7_PAD = 0x554,
+	PLAYER_VISIBLE_ITEM_8_CREATOR = 0x558,
+	PLAYER_VISIBLE_ITEM_8_0 = 0x560,
+	PLAYER_VISIBLE_ITEM_8_PROPERTIES = 0x580,
+	PLAYER_VISIBLE_ITEM_8_PAD = 0x584,
+	PLAYER_VISIBLE_ITEM_9_CREATOR = 0x588,
+	PLAYER_VISIBLE_ITEM_9_0 = 0x590,
+	PLAYER_VISIBLE_ITEM_9_PROPERTIES = 0x5B0,
+	PLAYER_VISIBLE_ITEM_9_PAD = 0x5B4,
+	PLAYER_VISIBLE_ITEM_10_CREATOR = 0x5B8,
+	PLAYER_VISIBLE_ITEM_10_0 = 0x5C0,
+	PLAYER_VISIBLE_ITEM_10_PROPERTIES = 0x5E0,
+	PLAYER_VISIBLE_ITEM_10_PAD = 0x5E4,
+	PLAYER_VISIBLE_ITEM_11_CREATOR = 0x5E8,
+	PLAYER_VISIBLE_ITEM_11_0 = 0x5F0,
+	PLAYER_VISIBLE_ITEM_11_PROPERTIES = 0x610,
+	PLAYER_VISIBLE_ITEM_11_PAD = 0x614,
+	PLAYER_VISIBLE_ITEM_12_CREATOR = 0x618,
+	PLAYER_VISIBLE_ITEM_12_0 = 0x620,
+	PLAYER_VISIBLE_ITEM_12_PROPERTIES = 0x640,
+	PLAYER_VISIBLE_ITEM_12_PAD = 0x644,
+	PLAYER_VISIBLE_ITEM_13_CREATOR = 0x648,
+	PLAYER_VISIBLE_ITEM_13_0 = 0x650,
+	PLAYER_VISIBLE_ITEM_13_PROPERTIES = 0x670,
+	PLAYER_VISIBLE_ITEM_13_PAD = 0x674,
+	PLAYER_VISIBLE_ITEM_14_CREATOR = 0x678,
+	PLAYER_VISIBLE_ITEM_14_0 = 0x680,
+	PLAYER_VISIBLE_ITEM_14_PROPERTIES = 0x6A0,
+	PLAYER_VISIBLE_ITEM_14_PAD = 0x6A4,
+	PLAYER_VISIBLE_ITEM_15_CREATOR = 0x6A8,
+	PLAYER_VISIBLE_ITEM_15_0 = 0x6B0,
+	PLAYER_VISIBLE_ITEM_15_PROPERTIES = 0x6D0,
+	PLAYER_VISIBLE_ITEM_15_PAD = 0x6D4,
+	PLAYER_VISIBLE_ITEM_16_CREATOR = 0x6D8,
+	PLAYER_VISIBLE_ITEM_16_0 = 0x6E0,
+	PLAYER_VISIBLE_ITEM_16_PROPERTIES = 0x700,
+	PLAYER_VISIBLE_ITEM_16_PAD = 0x704,
+	PLAYER_VISIBLE_ITEM_17_CREATOR = 0x708,
+	PLAYER_VISIBLE_ITEM_17_0 = 0x710,
+	PLAYER_VISIBLE_ITEM_17_PROPERTIES = 0x730,
+	PLAYER_VISIBLE_ITEM_17_PAD = 0x734,
+	PLAYER_VISIBLE_ITEM_18_CREATOR = 0x738,
+	PLAYER_VISIBLE_ITEM_18_0 = 0x740,
+	PLAYER_VISIBLE_ITEM_18_PROPERTIES = 0x760,
+	PLAYER_VISIBLE_ITEM_18_PAD = 0x764,
+	PLAYER_VISIBLE_ITEM_19_CREATOR = 0x768,
+	PLAYER_VISIBLE_ITEM_19_0 = 0x770,
+	PLAYER_VISIBLE_ITEM_19_PROPERTIES = 0x790,
+	PLAYER_VISIBLE_ITEM_19_PAD = 0x794,
+	PLAYER_FIELD_INV_SLOT_HEAD = 0x798,
+	PLAYER_FIELD_PACK_SLOT_1 = 0x850,
+	PLAYER_FIELD_BANK_SLOT_1 = 0x8D0,
+	PLAYER_FIELD_BANKBAG_SLOT_1 = 0x990,
+	PLAYER_FIELD_VENDORBUYBACK_SLOT_1 = 0x9C0,
+	PLAYER_FIELD_KEYRING_SLOT_1 = 0xA20,
+	PLAYER_FARSIGHT = 0xB20,
+	PLAYER__FIELD_COMBO_TARGET = 0xB28,
+	PLAYER_XP = 0xB30,
+	PLAYER_NEXT_LEVEL_XP = 0xB34,
+	PLAYER_SKILL_INFO_1_1 = 0xB38,
+	PLAYER_CHARACTER_POINTS1 = 0x1138,
+	PLAYER_CHARACTER_POINTS2 = 0x113C,
+	PLAYER_TRACK_CREATURES = 0x1140,
+	PLAYER_TRACK_RESOURCES = 0x1144,
+	PLAYER_BLOCK_PERCENTAGE = 0x1148,
+	PLAYER_DODGE_PERCENTAGE = 0x114C,
+	PLAYER_PARRY_PERCENTAGE = 0x1150,
+	PLAYER_CRIT_PERCENTAGE = 0x1154,
+	PLAYER_RANGED_CRIT_PERCENTAGE = 0x1158,
+	PLAYER_EXPLORED_ZONES_1 = 0x115C,
+	PLAYER_REST_STATE_EXPERIENCE = 0x125C,
+	PLAYER_FIELD_COINAGE = 0x1260,
+	PLAYER_FIELD_POSSTAT0 = 0x1264,
+	PLAYER_FIELD_POSSTAT1 = 0x1268,
+	PLAYER_FIELD_POSSTAT2 = 0x126C,
+	PLAYER_FIELD_POSSTAT3 = 0x1270,
+	PLAYER_FIELD_POSSTAT4 = 0x1274,
+	PLAYER_FIELD_NEGSTAT0 = 0x1278,
+	PLAYER_FIELD_NEGSTAT1 = 0x127C,
+	PLAYER_FIELD_NEGSTAT2 = 0x1280,
+	PLAYER_FIELD_NEGSTAT3 = 0x1284,
+	PLAYER_FIELD_NEGSTAT4 = 0x1288,
+	PLAYER_FIELD_RESISTANCEBUFFMODSPOSITIVE = 0x128C,
+	PLAYER_FIELD_RESISTANCEBUFFMODSNEGATIVE = 0x12A8,
+	PLAYER_FIELD_MOD_DAMAGE_DONE_POS = 0x12C4,
+	PLAYER_FIELD_MOD_DAMAGE_DONE_NEG = 0x12E0,
+	PLAYER_FIELD_MOD_DAMAGE_DONE_PCT = 0x12FC,
+	PLAYER_FIELD_BYTES = 0x1318,
+	PLAYER_AMMO_ID = 0x131C,
+	PLAYER_SELF_RES_SPELL = 0x1320,
+	PLAYER_FIELD_PVP_MEDALS = 0x1324,
+	PLAYER_FIELD_BUYBACK_PRICE_1 = 0x1328,
+	PLAYER_FIELD_BUYBACK_TIMESTAMP_1 = 0x1358,
+	PLAYER_FIELD_SESSION_KILLS = 0x1388,
+	PLAYER_FIELD_YESTERDAY_KILLS = 0x138C,
+	PLAYER_FIELD_LAST_WEEK_KILLS = 0x1390,
+	PLAYER_FIELD_THIS_WEEK_KILLS = 0x1394,
+	PLAYER_FIELD_THIS_WEEK_CONTRIBUTION = 0x1398,
+	PLAYER_FIELD_LIFETIME_HONORBALE_KILLS = 0x139C,
+	PLAYER_FIELD_LIFETIME_DISHONORBALE_KILLS = 0x13A0,
+	PLAYER_FIELD_YESTERDAY_CONTRIBUTION = 0x13A4,
+	PLAYER_FIELD_LAST_WEEK_CONTRIBUTION = 0x13A8,
+	PLAYER_FIELD_LAST_WEEK_RANK = 0x13AC,
+	PLAYER_FIELD_BYTES2 = 0x13B0,
+	PLAYER_FIELD_WATCHED_FACTION_INDEX = 0x13B4,
+	PLAYER_FIELD_COMBAT_RATING_1 = 0x13B8,
+	TOTAL_PLAYER_FIELDS = 0xB6
+};
+
+internal enum Corpse : uint
+{
+    X = 0xB4E284,
+    Y = X + 4,
+    Z = Y + 4,
+}
+
+public static void SetTarget(ulong guid)
+{
+    WoWManager.Memory.Write<UInt64>(WoWManager.BaseAddress + WoWOffset.LastTargetGuid, guid);
+    DoString("RunMacroText(\"/targetlasttarget\")");
+}
+
+class CameraInfo
+{
+public:
+	__int32 *VTable;	 //0x0000 
+	__int32 unknown0;	 //0x0004 
+	float fPos[3];		 //0x0008 
+	float fViewMat[3][3];	 //0x0014 
+	float fFov;		 //0x0038 
+	float zNearPlane;	 //0x003C 
+	float zFarPlane;	 //0x0040 
+	float aspectRatio;	 //0x0044 
+
+};//Size=0x0048
+
+I just use DirectX, I hooked CGWorldFrame::RenderWorld 0x482D70 thinking it was CWorldSceneRender::Render but nothing. Going to keep playing around with it.
+
+CTM function (0x611130)
+CGGameUI::RightClick (0x492820) 
+
+CGPlayer_C::LootUnit 0x5DF2A0 
+CGGameObject_C__OnRightClick 005F8660 
+
+namespace ClassicWowHack.Game.Objects
+{
+    class GameObject : Object
+    {
+        public void Use()
+        {
+            var packet = new CDataStore(12) { OpCode = OpCode.CMSG_GAMEOBJ_USE };
+            packet.Write(Guid);
+            Net.Send(packet);
+        }
+    }
+}
+
+CWorldMap__QueryOutdoors = 0x69D830,
+Spell_C_CancelAura = 0x6E7040,
+CWorld__QueryLiquidStatus = 0x6723D0,
+Spell_C_HandleTerrainClick = 0x6E60F0,
+ItemCacheDBGetRow = 0x55BA30,
+CreatureCacheDBGetRow = 0x556AA0,
+GameObjectCacheDBGetRow = 0x558560,
+
+internal enum Warden : uint
+{
+    LoadWardenModuleEnd = 0x7A7D72,
+    CMSG_WARDEN_DATA_Handler = 0x6CA6A0,
+    SMSG_WARDEN_DATA_Handler = 0x6CA5C0,
+    Warden_RC4KeyPtr = 0xCE897C,
+    Warden_RC4KeySize = 0x102,
+    Warden_RC4KeyOffset = 0x20,
+}
+
+internal enum Console : uint
+{
+    ConsoleWrite = 0x63CD00,
+    ConsoleRegisterCommand = 0x63F9E0,
+    ConsoleUnregisterCommand = 0x63FB40,
+    EnableConsole = 0xC4EC20,
+    InvalidfunctionPtrStart = 0x884800, //1
+    InvalidfunctionPtrEnd = 0x884C00,  //7FFFFFFF
+}
+
+internal enum CharacterScreen : uint
+{
+    Pointer = 0xB42144,
+    Size = 0x120,
+    NumCharacters = Pointer - 0x4,
+    LoginState = 0xB41478,
+}
+
+internal enum Spells : uint
+{
+    SpellCooldownPtr = 0xCECAEC,
+    SpellCooldownOffset = 0xCECAF4,
+    SpellMaxIndex = 0xC0D78C,
+    SpellBookKnownSpellsPlayer = 0xB700F0,
+    SpellBookKnownSpellsPet = 0xB6F098,
+    SpellIsTargeting = 0xCECAC0,
+}
+
+public enum ClientDb
+{
+    AnimationData = 0xC0E06C,
+    AreaPOI = 0xC0E058,
+    AreaTable = 0xC0E044,
+    AreaTrigger = 0xC0E030,
+    AttackAnimKits = 0xC0E01C,
+    AttackAnimTypes = 0xC0E004,
+    AuctionHouse = 0xC0DFF0,
+    BankBagSlotPrices = 0xC0DFDC,
+    CameraShakes = 0xC0DFC8,
+    Cfg_Categories = 0xC0DFB4,
+    Cfg_Configs = 0xC0DFA0,
+    CharBaseInfo = 0xC0DF8C,
+    CharHairGeosets = 0xC0DF78,
+    CharSections = 0xC0DF64,
+    CharStartOutfit = 0xC0DF50,
+    CharVariations = 0xC0DF3C,
+    CharacterFacialHairStyles = 0xC0DF28,
+    ChatChannels = 0xC0DF14,
+    ChatProfanity = 0xC0DF00,
+    ChrClasses = 0xC0DEEC,
+    ChrRaces = 0xC0DED8,
+    CinematicCamera = 0xC0DEC4,
+    CinematicSequences = 0xC0DEB0,
+    CreatureDisplayInfo = 0xC0DE88,
+    CreatureDisplayInfoExtra = 0xC0DE9C,
+    CreatureFamily = 0xC0DE74,
+    CreatureModelData = 0xC0DE60,
+    CreatureSoundData = 0xC0DE4C,
+    CreatureSpellData = 0xC0DE38,
+    CreatureType = 0xC0DE24,
+    DeathThudLookups = 0xC0DE10,
+    DurabilityQuality = 0xC0DDE8,
+    DurabilityCosts = 0xC0DDFC,
+    Emotes = 0xC0DDD4,
+    EmotesText = 0xC0DD98,
+    EmotesTextData = 0xC0DDC0,
+    EmotesTextSound = 0xC0DDAC,
+    EnvironmentalDamage = 0xC0DD84,
+    Exhaustion = 0xC0DD70,
+    Faction = 0xC0DD48,
+    FactionGroup = 0xC0DD5C,
+    FactionTemplate = 0xC0DD34,
+    FootprintTextures = 0xC0DD20,
+    FootstepTerrainLookup = 0xC0DD0C,
+    GameObjectArtKit = 0xC0DCF8,
+    GameObjectDisplayInfo = 0xC0DCE4,
+    GameTips = 0xC0DCD0,
+    GMSurveyCurrentSurvey = 0xC0DCBC,
+    GMSurveyQuestions = 0xC0DCA8,
+    GMSurveySurveys = 0xC0DC94,
+    GMTicketCategory = 0xC0DC80,
+    GroundEffectDoodad = 0xC0DC6C,
+    GroundEffectTexture = 0xC0DC58,
+    HelmetGeosetVisData = 0xC0DC44,
+    ItemBagFamily = 0xC0DC30,
+    ItemClass = 0xC0DC1C,
+    ItemDisplayInfo = 0xC0DC08,
+    ItemGroupSounds = 0xC0DBF4,
+    ItemPetFood = 0xC0DBE0,
+    ItemRandomProperties = 0xC0DBCC,
+    ItemSet = 0xC0DBB8,
+    ItemSubClass = 0xC0DB90,
+    ItemSubClassMask = 0xC0DBA4,
+    ItemVisualEffects = 0xC0DB7C,
+    ItemVisuals = 0xC0DB68,
+    LanguageWords = 0xC0DB54,
+    Languages = 0xC0DB40,
+    LfgDungeons = 0xC0DB2C,
+    Light = 0xCE9D60,
+    LightFloatBand = 0xCE9D88,
+    LightIntBand = 0xCE9D9C,
+    LightParams = 0xCE9D74,
+    LightSkybox = 0xCE9DB0,
+    LiquidType = 0xC0DB18,
+    LoadingScreens = 0xC0DB04,
+    LoadingScreenTaxiSplines = 0xC0DAF0,
+    Lock = 0xC0DADC,
+    LockType = 0xC0DAC8,
+    MailTemplate = 0xC0DAB4,
+    Map = 0xC0DAA0,
+    Material = 0xC0DA8C,
+    NameGen = 0xC0DA78,
+    NPCSounds = 0xC0DA64,
+    NamesProfanity = 0xC0DA50,
+    NamesReserved = 0xC0DA3C,
+    Package = 0xC0DA28,
+    PageTextMaterial = 0xC0DA14,
+    PaperDollItemFrame = 0xC0DA00,
+    PetLoyalty = 0xC0D9EC,
+    PetPersonality = 0xC0D9D8,
+    QuestInfo = 0xC0D9C4,
+    QuestSort = 0xC0D9B0,
+    Resistances = 0xC0D99C,
+    ServerMessages = 0xC0D988,
+    SheatheSoundLookups = 0xC0D974,
+    SkillCostsData = 0xC0D960,
+    SkillLineAbility = 0xC0D94C,
+    SkillLineCategory = 0xC0D938,
+    SkillLine = 0xC0D924,
+    SkillRaceClassInfo = 0xC0D910,
+    SkillTiers = 0xC0D8FC,
+    SoundAmbience = 0xC0D8E8,
+    SoundEntries = 0xC0D8D4,
+    SoundProviderPreferences = 0xC0D8C0,
+    SoundSamplePreferences = 0xC0D8AC,
+    SoundWaterType = 0xC0D898,
+    SpamMessages = 0xC0D884,
+    SpellCastTimes = 0xC0D870,
+    SpellCategory = 0xC0D85C,
+    SpellChainEffects = 0xC0D848,
+    Spell = 0xC0D780,
+    SpellDispelType = 0xC0D834,
+    SpellDuration = 0xC0D820,
+    SpellEffectCameraShakes = 0xC0D80C,
+    SpellFocusObject = 0xC0D7F8,
+    SpellIcon = 0xC0D7E4,
+    SpellItemEnchantment = 0xC0D7D0,
+    SpellMechanic = 0xC0D7BC,
+    SpellRadius = 0xC0D7A8,
+    SpellRange = 0xC0D794,
+    SpellShapeshiftForm = 0xC0D76C,
+    SpellVisual = 0xC0D730,
+    SpellVisualEffectName = 0xC0D758,
+    SpellVisualKit = 0xC0D744,
+    StableSlotPrices = 0xC0D71C,
+    Stationery = 0xC0D708,
+    StringLookups = 0xC0D6F4,
+    Talent = 0xC0D6E0,
+    TalentTab = 0xC0D6CC,
+    TaxiNodes = 0xC0D6B8,
+    TaxiPath = 0xC0D690,
+    TaxiPathNode = 0xC0D6A4,
+    TerrainType = 0xC0D67C,
+    TerrainTypeSounds = 0xC0D668,
+    TransportAnimation = 0xC0D654,
+    UISoundLookups = 0xC0D640,
+    UnitBlood = 0xC0D618,
+    UnitBloodLevels = 0xC0D62C,
+    VocalUISounds = 0xC0D604,
+    WMOAreaTable = 0xC0D5F0,
+    WeaponImpactSounds = 0xC0D5DC,
+    WeaponSwingSounds2 = 0xC0D5C8,
+    WorldMapArea = 0xC0D5B4,
+    WorldMapContinent = 0xC0D5A0,
+    WorldMapOverlay = 0xC0D58C,
+    WorldSafeLocs = 0xC0D578,
+    WorldStateUI = 0xC0D564,
+    ZoneIntroMusic = 0xC0D550,
+    ZoneMusic = 0xC0D53C,
+}
+
+WaterWalk = 0x631610,
+RemoveLuaProtection = 0x494A57,
+ShowAllLevels = 0x518062,
+UnderstandAllLanguages = 0x5EC720
+
+CGUnit_C__UpdateDisplayInfo = 0x60ABE0
+
+last hardware action is 0xCF0BC8 Write tick count to that value every few seconds to avoid AFK.
+Edit: some people might patch the function which checks this value in order to toggle AFK, but I 
+prefer to update this value with a timer because it is harder (realistically is is probably impossible) for Warden to catch.
+
+Morph
+Playing around with this function atm 0x004667A0 / 0x00467160
+Magic.Write<int>(Manager.Me.StorageField + Offsets.PlayerFields.PLAYER_VISIBLE_ITEM_5_0, 16809); //chest
+Wow.MorphUnit(Manager.Me, 1337); //l33t
+Wow.MorphUnit(Manager.Me, Manager.Me.NativeDisplayID);
+
+TerrainCollision = 0x6721F3
+WMOCollision = 0x6A467B
+M2Collision1 = 0x6ABF13
+M2Collision2 = 0x6ABC5A
+RemoveAFK = 0x482ED3
+FallSpeed = 0x87D894
+
+CallAutoLoot = 0x4C1FA0
+
+static void Detour(uint codeCave, uint Address, byte[] hook_func, ref BlackMagic WoW)
+{
+
+    Console.WriteLine("Detouring 0x{0:X}", Address);
+    Console.WriteLine("With Function at 0x{0:X}", codeCave);
+
+    WoW.WriteBytes(codeCave, hook_func);
+    //Our function is in memory
+    WoW.Asm.Clear();
+    WoW.Asm.AddLine("push {0}", codeCave);
+    WoW.Asm.AddLine("retn"); //pops codeCave from the stack into EIP
+
+    WoW.WriteBytes(Address, WoW.Asm.Assemble()); //Detour the Function
+}
+
+static void Main(string[] args)
+{
+    BlackMagic WoW = new BlackMagic(SProcess.GetProcessFromProcessName("WoW"));
+
+    uint CodeCave = WoW.AllocateMemory();
+
+    WoW.Asm.Clear(); //Make sure no ASM lines exist
+    //An STD call that returns true
+    WoW.Asm.AddLine("mov al,1");
+    WoW.Asm.AddLine("retn 4");
+
+    //0x4C1FA0 -> Autoloot
+
+    Detour(CodeCave, 0x4C1FA0, WoW.Asm.Assemble(), ref WoW);
+    //tracking all objects
+
+    Console.ReadLine();
+}
+
+[UnmanagedFunctionPointer(CallingConvention.ThisCall)]
+private delegate void CallAutoLoot(uint zero);
+
+internal static void LootItems()
+{
+    lock (Memory.Magic.Executor.Lock)
+    {
+        string[] asm =
+        {
+            "mov ecx, 0",
+            "call " + (uint) Offsets.Fuctions.CallAutoLoot,
+            "retn"
+        };
+        Memory.Magic.Executor.Execute(asm);
+    }
+}
+
+static auto const castSpellByName = reinterpret_cast <uint32(__fastcall *)(std::string, boolean)>(0x4B4AB0);//Script_CastSpellByName
+
+Try 006126B0 CGPlayer_C::IsLooting
+
+public Boolean isLootWindowOpen() 
+{
+    return (WowReader.ReadUInt64(lootWindow) != 0L); // 0xB71B48
+}
+
+0xB71B48 contains the GUID of the current looting wowobject, so if it's != 0, then you are currently looting something.
+
+Globals.Magic.SuspendThread();
+try
+{
+    uint codeCave = Globals.Magic.AllocateMemory(8);
+    if (codeCave != 0)
+    {
+        Globals.Magic.Asm.Clear();
+        //Globals.Magic.Asm.AddLine("mov ecx, 0");
+        Globals.Magic.Asm.AddLine("call " + (uint)0x4C1FA0);
+        Globals.Magic.Asm.AddLine("retn");
+        Globals.Magic.Asm.InjectAndExecute(codeCave);
+        Globals.Magic.Asm.Clear();
+    }
+    Globals.Magic.FreeMemory(codeCave);
+}
+catch (Exception ee)
+{
+    MessageBox.Show("拾取call失败，原因：" + ee.ToString());
+}
+Globals.Magic.ResumeThread();  
+
+Well I'm not sure where it is but ClientServices_Send is at 0x5AB630. You can put a breakpoint on that, move forward, and see which function calls ClientServices_Send.
+
+EverScan 
+By : Darklinux @ OwnedCore.com 
+
+Address : 0x60ff71     Size : 0x1
+Address : 0x7c69a0     Size : 0x3
+Address : 0x5ec720     Size : 0x8
+Address : 0x49f5dd     Size : 0x1
+Address : 0x615cf5     Size : 0x1
+Address : 0x7c6269     Size : 0x4
+Address : 0x7c4955     Size : 0x3
+Address : 0x6334f0     Size : 0x1
+Address : 0x635c3a     Size : 0x1
+Address : 0x60ff65     Size : 0x2
+Address : 0x60bfa0     Size : 0x2
+Address : 0x6ca1b5     Size : 0x1
+Address : 0x60bfbf     Size : 0x2
+Address : 0x6ab1bf     Size : 0x3
+Address : 0x636198     Size : 0x1
+Address : 0x7c6272     Size : 0x4
+Address : 0x6341e3     Size : 0x2
+Address : 0x615ba7     Size : 0x4
+Address : 0x482be3     Size : 0x1
+Address : 0x60bfb1     Size : 0x2
+Address : 0x7c625e     Size : 0x2
+Address : 0x6ab494     Size : 0x1
+Address : 0x618919     Size : 0x4
+Address : 0x7c63a8     Size : 0x4
+Address : 0x5e642c     Size : 0x5
+Address : 0x6163db     Size : 0x3
+Address : 0x7c63dd     Size : 0x3
+Address : 0x7c705f     Size : 0x3
+Address : 0x482ed8     Size : 0x6
+Address : 0x4711e0     Size : 0x2
+Address : 0x7c6206     Size : 0xb
+Address : 0x494a50     Size : 0x7
+Address : 0x636598     Size : 0x1
+Address : 0x5ed28d     Size : 0x6
+Address : 0x636ed4     Size : 0x1
+Address : 0x6d2743     Size : 0x6
+Address : 0x6cee5b     Size : 0x6
+Address : 0x60f7c9     Size : 0x6
+Address : 0x67063e     Size : 0x1
+Address : 0x680b81     Size : 0x5
+Address : 0x7c705c     Size : 0x6
+Address : 0x6341bc     Size : 0x2
+Address : 0x4711ea     Size : 0x1
+Address : 0x6cee4e     Size : 0x5
+Address : 0x60f650     Size : 0x6
+Address : 0x5ed2e3     Size : 0x6
+Address : 0x518062     Size : 0x1
+Address : 0x49f6f2     Size : 0x3
+Address : 0x7c63da     Size : 0x3
+Address : 0x63379c     Size : 0x1
+Address : 0x6a467b     Size : 0x1
+Address : 0x6abf13     Size : 0x1
+Address : 0x40362b     Size : 0x3
+Address : 0x6163de     Size : 0xa
+
+This is only marginally on-topic (but more so than the guy above me hahaha).
+I wanted to have a 'smart' solution to the problem of stop-casting since my latency on European (read: all) private servers is typically in the 250-350ms range. I tried modifying the game to not give an error if you tried to cast a spell while it was already casting and it negatively affected too many other things. Then I tried adding my own lua function called CastSpellAtTarget() which takes the spell id and casts it at your current target. This bypasses all client-side checking entirely. The results were tremendous. All I had to do was this:
+
+private static int CastSpellAtTarget(IntPtr luaStatePtr)
+{
+    var spellId = (uint) Lua.Core.GetNumber(luaStatePtr, 1);
+
+    var targetGuid = (ulong) Marshal.ReadInt64(Locator.TargetGuid);
+
+    if (targetGuid != 0)
+    {
+        var targetPackedGuid = new WowGuid(targetGuid).PackedGuid;
+
+        var packet = new CDataStore(10 + targetPackedGuid.Length) {OpCode = OpCode.CMSG_CAST_SPELL};
+
+        packet.Write(spellId);
+        packet.Write((ushort) 2); // TARGET_FLAG_UNIT
+        packet.Write(targetPackedGuid);
+
+        Net.Send(packet);
+    }
+
+    return 1;
+}
+
+Edit: Also, I patched two locations with 5x NOP (0x90) to prevent spamming of the error message and sound. Those two locations are 0x6E1AA6 and 0x6E21DD. This makes things run smoother.
+
+SetFacing = 0x76DCE0
+
+DWORD
+ClntObjMgrObjectPtr(
+    QWORD Guid
+    )
+{
+    UINT UnitGuid;
+    UINT UnitBaseAddress;
+
+    UnitBaseAddress = ReadDword(ReadDword(s_curMgr) + 0xAC);
+    while (UnitBaseAddress != 0) {
+        if ((UnitGuid = (ReadQword(UnitBaseAddress + 0x30) == Guid)) != 0) {
+            return UnitBaseAddress;
+        }
+        UnitBaseAddress = ReadDword(UnitBaseAddress + 0x3C);
+    }
+    return 0;
+}
+
+QWORD
+ClntObjMgrGetActivePlayer(
+    VOID
+    )
+{
+    return ReadDword(ReadDword(s_curMgr) + 0xC0);
+}
+
+Playerbase = ClntObjMgrObjectPtr(ClntObjMgrGetActivePlayer());
+
+EverScan 
+By : Darklinux @ OwnedCore.com 
+
+Address : 0x7c6272     Size : 0x4 //JumpGravity
+Address : 0x7c625e     Size : 0x2 //InfiniteJump
+Address : 0x6163db     Size : 0x2 //AntiRoot
+Address : 0x615cf5     Size : 0x1 //AntiMove
+Address : 0x7c625f     Size : 0x1 //AntiJump
+Address : 0x7c63da     Size : 0x4 //NoFallDamage
+Address : 0x6341bc     Size : 0x2 //SuperFly
+Address : 0x616749     Size : 0x2
+Address : 0x5fe54f     Size : 0x1
+Address : 0x6341e3     Size : 0x2
+Address : 0x7c620d     Size : 0x2
+Address : 0x6d2743     Size : 0x6
+Address : 0x6cee4e     Size : 0x6
+Address : 0x6cee5b     Size : 0x6
+Address : 0x6ab494     Size : 0x1
+Address : 0x63379c     Size : 0x1
+Address : 0x60bfa0     Size : 0x2
+Address : 0x615ba7     Size : 0x4 //HeartbeatInterval
+Address : 0x7c6269     Size : 0x4 //JumpGravityWater
+Address : 0x6ab1bf     Size : 0x3
+Address : 0x60bfb1     Size : 0x2
+Address : 0x60fc30     Size : 0xa //ClickToMove Patch
+Address : 0x482ed8     Size : 0x6 //RemoveAFK
+Address : 0x494a50     Size : 0x7 //RemoveLuaProtection
+Address : 0x5abd50     Size : 0x6
+Address : 0x60bfbf     Size : 0x2
+Address : 0x518062     Size : 0x1 //ShowAllLevels
+Address : 0x4c21c0     Size : 0x1
+Address : 0x7c4955     Size : 0x1
+Address : 0x618918     Size : 0x4
+Address : 0x7c4d41     Size : 0xa
+Address : 0x3417d8     Size : 0x4
+Address : 0x3417dc     Size : 0x4
+Address : 0x3417e0     Size : 0x4
+Address : 0x3417e4     Size : 0x4
+Address : 0x3417ec     Size : 0x4
+Address : 0x3417f0     Size : 0x4
+Address : 0x3417f4     Size : 0x4
+Address : 0x3417f8     Size : 0x4
+Address : 0x3417fc     Size : 0x4
+Address : 0x341800     Size : 0x4
+Address : 0x6abf13     Size : 0x1 //M2Collision1
+Address : 0x6a467b     Size : 0x1 //WMOCollision
+Address : 0x6163de     Size : 0xa
+Address : 0x7c63bd     Size : 0x3
+Address : 0x7c63d9     Size : 0x1
+Address : 0x636ed4     Size : 0x1
+Address : 0x6334f0     Size : 0x1
+Address : 0x635c3a     Size : 0x1
+Address : 0x636198     Size : 0x1
+Address : 0x636598     Size : 0x1
+Address : 0x7c63dd     Size : 0x3
+Address : 0x49f6f2     Size : 0x3
+Address : 0x49f5dd     Size : 0x1
+Address : 0x3418a0     Size : 0x32
+Address : 0x3418c8     Size : 0x32
+Address : 0x341900     Size : 0x32
+Address : 0x341948     Size : 0x32
+Address : 0x3419d8     Size : 0x32
+Address : 0x341a00     Size : 0x32
+Address : 0x341a38     Size : 0x14
+Address : 0x341a90     Size : 0x14
+Address : 0x341ab8     Size : 0x32
+
+public unsafe struct CGCamera
+{
+    public IntPtr vTable;           // 0x0
+    private int unk0;               // 0x4
+    public Vector3 Position;        // 0x8
+    public fixed float Facing[9];   // 0x14 (3x3 Matrix)
+    public float NearClip;          // 0x38
+    public float FarClip;           // 0x3C
+    public float FieldOfView;       // 0x40
+    public float Aspect;            // 0x44
+}
+
+public class ItemCacheEntry
+{
+    public int Entry;                           // 0x0
+    //public int Unknown0;                      // 0x4
+    //public int Unknown1;                      // 0x8
+    //public int Unknown2;                      // 0xC
+    //public uint NextCachedItemAddress;        // 0x10
+    //public int Unknown3                       // 0x14
+    public ItemClass Class;                     // 0x18
+    public int SubClassId;                      // 0x1C
+    public string Name;                         // Pointer -> 0x20, 0x24, 0x28 or 0x2C (255 Byte String)
+    public int DisplayId;                       // 0x30
+    public ItemQuality Quality;                 // 0x34
+    public FlagsAttribute Flags;                // 0x38
+    public int BuyPrice;                        // 0x3C
+    public int SellPrice;                       // 0x40
+    public InventoryType InventoryType;         // 0x44
+    public int AllowableClass;                  // 0x48
+    public int AllowableRace;                   // 0x4C
+    public int ItemLevel;                       // 0x50
+    public int RequiredLevel;                   // 0x54
+    public int RequiredSkill;                   // 0x58
+    public int RequiredSKillRank;               // 0x5C
+    public int RequiredSpell;                   // 0x60
+    public int RequiredHonorRank;               // 0x64
+    public int RequiredCityRank;                // 0x68
+    public int RequiredReputationFaction;       // 0x6C
+    public int RequiredReputationRank;          // 0x70
+    public int MaxCount;                        // 0x74
+    public int Stackable;                       // 0x78
+    public int ContainerSlots;                  // 0x7C
+    public StatType[] StatTypes;                // 0x80 - 0xA0
+    public int[] StatValues;                    // 0xA4 - 0xCC
+    public int[] DamageMin;                     // 0xD0 - 0xE0
+    public int[] DamageMax;                     // 0xE4 - 0xF4
+    public Resistance[] DamageType;             // 0xF8 - 0x108
+    public int Armor;                           // 0x10C
+    public int HolyRes;                         // 0x110
+    public int FireRes;                         // 0x114
+    public int NatureRes;                       // 0x118
+    public int FrostRes;                        // 0x11C
+    public int ShadowRes;                       // 0x120
+    public int ArcaneRes;                       // 0x124
+    public int Delay;                           // 0x128
+    public int AmmoType;                        // 0x12C
+    public int RangedModRange;                  // 0x130
+    public int[] SpellIds;                      // 0x134 - 0x144
+    public ItemSpelltriggerType[] SpellTrigger; // 0x148 - 0x158
+    public int[] SpellCharges;                  // 0x15C - 0x16C
+    public int[] SpellCooldown;                 // 0x170 - 0x180
+    public int[] SpellCategory;                 // 0x184 - 0x194
+    public int[] SpellCategoryCooldown;         // 0x198 - 1A8
+    public ItemBondingType Bonding;             // 0x1AC
+    public string Description;                  // 0x1B0
+    public int PageText;                        // 0x1B4
+    public int LanguageId;                      // 0x1B8
+    public int PageMaterial;                    // 0x1BC
+    public int StartQuest;                      // 0x1C0
+    public int LockId;                          // 0x1C4
+    public int Material;                        // 0x1C8
+    public int Sheath;                          // 0x1CC
+    public int RandomProperty;                  // 0x1D0
+    public int Block;                           // 0x1D4
+    public int ItemSet;                         // 0x1D8
+    public int MaxDurability;                   // 0x1DC
+    public int Area;                            // 0x1E0
+    public int Map;                             // 0x1E4
+    public int BagFamily;                       // 0x1E8
+    //public int Entry;                         // 0x1EC
+    //public int Unknown4;                      // 0x1F0
+    //public int Unknown5;                      // 0x1F4
+    //public int Unknown6;                      // 0x1F8
+    //public int Unknown7;                      // 0x1FC
+}
+
+0055BA30     DbItemCache_GetInfoBlockByID
+00C0E2A0     CACHE_ITEM
+
+[StructLayout(LayoutKind.Sequential)]
+public unsafe struct ItemCacheRecord
+{
+    //public uint ItemId;
+    public ItemClass Class; // id from ItemClass.dbc
+    public uint SubClass; // id from ItemSubClass.dbc
+    [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.LPStr, SizeConst = 4)]
+    public string[] Name;
+    public uint DisplayInfoID; // id from ItemDisplayInfo.dbc
+    public ItemQuality Quality;
+    public ItemFlags Flags;
+    //public uint BuyCount;
+    public uint BuyPrice;
+    public uint SellPrice;
+    public InventoryType InventoryType;
+    public uint AllowableClass;
+    public uint AllowableRace;
+    public uint ItemLevel;
+    public uint RequiredLevel;
+    public uint RequiredSkill; // id from SkillLine.dbc
+    public uint RequiredSkillRank;
+    public uint RequiredSpell; // id from Spell.dbc
+    public uint RequiredHonorRank;
+    public uint RequiredCityRank;
+    public uint RequiredReputationFaction; // id from Faction.dbc
+    public uint RequiredReputationRank;
+    public uint MaxCount;
+    public uint Stackable;
+    public uint ContainerSlots;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10)]
+    public _ItemStat[] ItemStat;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 5)]
+    public _Damage[] Damage;
+    public uint Armor;
+    public uint HolyRes;
+    public uint FireRes;
+    public uint NatureRes;
+    public uint FrostRes;
+    public uint ShadowRes;
+    public uint ArcaneRes;
+    public uint Delay;
+    public uint AmmoType;
+    public float RangedModRange;
+    [MarshalAs(UnmanagedType.ByValArray, SizeConst = 5)]
+    public _Spell[] Spells;
+    public ItemBondType Bonding;
+    [MarshalAs(UnmanagedType.LPStr)]
+    public string Description;
+    public uint PageText;
+    public uint LanguageID;
+    public uint PageMaterial;
+    public uint StartQuest; // id from QuestCache.wdb
+    public uint LockID;
+    public uint Material; // id from Material.dbc
+    public uint Sheath;
+    public uint RandomProperty; // id from ItemRandomProperties.dbc
+    public uint Block;
+    public uint ItemSet; // id from ItemSet.dbc
+    public uint MaxDurability;
+    public uint Area; // id from AreaTable.dbc
+    public uint Map; // id from Map.dbc
+    public BagFamily BagFamily;
+    public uint ScriptId;
+    public uint DisenchantId;
+    public uint FoodType;
+    public uint MinMoneyLoot;
+    public uint MaxMoneyLoot;
+    public uint Duration;
+    public uint ExtraFlags;
+
+    #region Sub-structs
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct _Damage
+    {
+        public float DamageMin;
+        public float DamageMax;
+        public uint DamageType; // id from Resistances.dbc
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct _ItemStat
+    {
+        public uint ItemStatType;
+        public int ItemStatValue;
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct _Spell
+    {
+        public uint SpellId; // id from Spell.dbc
+        public uint SpellTrigger;
+        public int SpellCharges;
+        //public float SpellPPMRate;
+        public int SpellCooldown;
+        public uint SpellCategory; // id from SpellCategory.dbc
+        public int SpellCategoryCooldown;
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct _Socket
+    {
+        public uint Color;
+        public uint Content;
+    };
+};
+
+Hey, I managed to read spell names and other properties by its ID from the dbc (IDs from 0xB700F0). Right now I get the DBC row manually by itterating through the memory until I find my ID however I am wondering if there is also a function which I can pass my ID to obtain the row.
+I made a simple xref for the DBC pointer and could find about 20 calls taking it as parameter. I will report back here once I know more.
+
+Did anyone succeed obtaining cooldowns using iSpellCooldownPtr = 0xCECAEC and SpellCooldownOffset = 0xCECAF4 provided by Sacred?
+Just a little guess here:
+0xB700F0 holding the ID of the first spell in players spellbook. Adding up 0x4 will hold the next spell ID and so on.
+0xCECAEC => Somehow related to first spell in spellbook
+0xCECAEC + (0x8*X) => X representing the index in the spellbook.
+
+However I fail to see how those numbers have anything in common with spell cooldowns. Does anyone else know any reliable way to get the remaining cooldown of a spell before I can cast it again? Right now I am using a mix of DoString and GetText paired with some Lua function however this solution is pretty ugly.
+
+
+006E9FD0 Spell_C_GetAutoRepeatingSpell
+
+function getBuffDurationFromTexture(name) 
+GetSpellForBot = name 
+timeleft = -1 
+for i=0,31 do 
+           local id,cancel = GetPlayerBuff(i,'HELPFUL|HARMFUL|PASSIVE')
+                    if(name == GetPlayerBuffTexture(id)) then
+                                 timeleft = GetPlayerBuffTimeLeft(id) DEFAULT_CHAT_FRAME:AddMessage(timeleft) 
+                   return timeleft 
+             end 
+ end return 
+timeleft 
+end
+
+Edit: CGBuffBar::GetBuffByIndex is located at 0x4E4430, by the way.
+int __thiscall Script::GetPlayerBuffTimeLeft(void *this)
+{
+  void *luaState; // esi@1
+  double v2; // st7@3
+  char *v3; // eax@3
+  signed int result; // eax@4
+
+  luaState = this;
+  if ( !lua_isnumber(this, 1) )
+    luaL_error(luaState, "Usage: GetPlayerBuffTimeLeft(buffIndex)");
+  v2 = lua_tonumber();
+  v3 = CGBuffBar::GetBuffByIndex((signed __int64)v2);
+  if ( v3 )
+  {
+    lua_pushnumber((int)luaState, COERCE_UNSIGNED_INT64((double)(unsigned __int8)v3[9]));
+    result = 1;
+  }
+  else
+  {
+    lua_pushnumber((int)luaState, 0x3FF0000000000000ui64);
+    result = 1;
+  }
+  return result;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
