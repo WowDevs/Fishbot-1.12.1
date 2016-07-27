@@ -118,7 +118,6 @@
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
     <Content Include="Fishy.ico" />
-    <Content Include="Michal-Kowalkowski-Metro-Dating-Plenty-of-Fish.ico" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
